@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>วงเหล้า Party</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#090d1b">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{color-scheme:dark;--bg:#090d1b;--panel:#141b30;--text:#f4f6ff;--muted:#a8b2cc;--line:rgba(255,255,255,.10);--purple:#8b5cf6;--cyan:#38bdf8;--green:#34d399}
+html{min-height:100%;background:var(--bg)}
+body{font-family:"Noto Sans Thai",system-ui,sans-serif;color:var(--text);min-height:100dvh;padding:20px 14px 40px;background:radial-gradient(ellipse at 10% 0%,#6d28d930,transparent 50%),radial-gradient(ellipse at 100% 35%,#0284c722,transparent 45%),var(--bg);display:flex;justify-content:center}
+#app{width:100%;max-width:560px;min-width:0}
+h1{font-size:clamp(26px,6vw,36px);font-weight:800;letter-spacing:-.8px;margin:26px 0 22px;text-align:center}
+h2{font-size:25px;font-weight:800;margin:24px 0 12px;text-align:center}
+input,button{font:inherit}
+input{width:100%;padding:17px 18px;color:var(--text);background:#141b30;border:1px solid var(--line);border-radius:17px;margin:7px 0;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:#8f9bb7}
+input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px #8b5cf61f}
+button{width:100%;min-height:48px;padding:15px 18px;border-radius:16px;border:1px solid #ffffff14;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:white;font-weight:700;box-shadow:0 6px 18px #0003;cursor:pointer;touch-action:manipulation;transition:transform .15s,filter .15s,border-color .15s;margin:6px 0}
+button:active:not(:disabled){transform:scale(.97)}
+button:disabled{cursor:not-allowed;opacity:.4;box-shadow:none}
+button:focus-visible{outline:3px solid var(--cyan);outline-offset:4px}
+button.alt{background:#19223a;border-color:var(--line);box-shadow:none;color:#dce5ff}
+@media(hover:hover){
+  button:hover:not(:disabled){filter:brightness(1.12)}
+  .game-tile:hover{transform:translateY(-3px);border-color:#a78bfa80}
+}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;padding:12px;border:1px solid var(--line);border-radius:19px;background:#141b30cc;backdrop-filter:blur(16px);flex-wrap:wrap}
+.top>div:first-child{color:var(--muted);padding:0 4px}
+.top b{color:var(--cyan);letter-spacing:1px}
+.top .btns{margin-left:auto;display:flex;gap:6px}
+.top button{width:auto;min-height:40px;border-radius:12px;font-size:12px;padding:8px 11px;margin:0}
+.players{padding:12px 15px;border-radius:14px;background:#ffffff05;color:#b7c3df;overflow-wrap:anywhere;margin:8px 0 10px;font-size:13px}
+.center{text-align:center}
+.muted{color:var(--muted);opacity:1;line-height:1.8}
+.msg{font-size:23px;margin:14px 0;text-align:center;font-weight:bold;overflow-wrap:anywhere}
+.lose{color:#fda4af}
+.status{text-align:center;font-size:18px;font-weight:bold;margin:15px 0 12px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#141b30;color:#c2cce3}
+.status.go{background:#34d3990c;border-color:#34d39935;color:#6ee7b7}
+
+/* หน้าเลือกเกม */
+.lobby-hero{padding:28px 6px 22px;text-align:center}
+.lobby-badge{display:inline-block;padding:6px 12px;border:1px solid #a78bfa40;border-radius:999px;background:#8b5cf615;color:#c4b5fd;font-size:11px;font-weight:800;letter-spacing:2px}
+.lobby-hero h1{margin:12px 0 7px}
+.lobby-hero p{color:var(--muted);font-size:14px}
+.game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+button.game-tile{position:relative;min-height:168px;margin:0;padding:18px 15px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:7px;border:1px solid var(--line);border-radius:23px;background:radial-gradient(circle at 100% 0%,var(--tile-glow),transparent 75%),#141b30;overflow:hidden}
+.game-tile:last-child{grid-column:1 / -1;min-height:150px}
+.game-icon{display:grid;place-items:center;width:49px;height:49px;background:#ffffff0c;border:1px solid #ffffff0d;border-radius:16px;font-size:28px;margin-bottom:3px}
+.game-title{font-size:18px;font-weight:800}
+.game-desc{color:#b5bfd7;font-size:12px;font-weight:400;line-height:1.6}
+.game-arrow{position:absolute;top:18px;right:17px;color:#ffffff75;font-size:20px}
+.lobby-note{text-align:center;margin:14px 0;color:#8f9bb7;font-size:12px}
+
+/* กล่องคนหลุด */
+.offline-box{background:#351827;border:1px solid #fb718560;border-radius:19px;padding:14px;margin:6px 0 12px}
+.offline-box .names{color:#fecdd3;overflow-wrap:anywhere;margin-bottom:8px;font-size:14px}
+button.clear-btn{background:linear-gradient(135deg,#e11d48,#f43f5e);font-size:17px;padding:12px;margin:0;box-shadow:0 5px 20px #e11d4825}
+
+/* คิว */
+.queue{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;font-size:14px;margin:8px 0;padding:14px 10px;color:#697795}
+.queue span{padding:7px 12px;border-radius:12px;background:#182139;color:#aebbd7;border:1px solid var(--line);max-width:100%;overflow-wrap:anywhere}
+.queue span.now{background:linear-gradient(135deg,#a78bfa,#818cf8);color:#11152b;border-color:transparent;box-shadow:0 0 20px #8b5cf62b;font-weight:bold}
+
+/* เปิดไพ่ */
+.card{width:min(220px,70vw);height:300px;margin:20px auto;background:#f8fafc;border-radius:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:72px;font-weight:bold;color:#111;box-shadow:0 20px 50px #0005}
+.card.red{color:#d00}
+.card.back{border:5px solid #ffffff20;background:repeating-linear-gradient(45deg,#7c3aed 0 12px,#6d28d9 12px 24px)}
+.hist{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:15px 0}
+.hist span{background:#fff;color:#111;border-radius:9px;padding:7px 10px;font-weight:bold}
+.hist span.red{color:#d00}
+
+/* รอดหรือร่วง */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:17px 0}
+.pc{aspect-ratio:3/4;margin:0;padding:4px;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 6px 14px #0003;min-height:0;min-width:0}
+.pc span{font-size:clamp(28px,8vw,42px);line-height:1}
+.pc small{font-size:11px;font-weight:normal;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:white}
+.pc.back{background:radial-gradient(circle at 50% 0%,#8b5cf62b,transparent 80%),#1c2342;border:1px solid #a78bfa45;font-size:28px;color:#c4b5fd}
+.pc.back:disabled{opacity:.48}
+.pc.safe{background:linear-gradient(145deg,#10b981,#047857);border-color:#6ee7b760;opacity:1}
+.pc.bad{background:linear-gradient(145deg,#fb7185,#be123c);outline:2px solid #fda4af;outline-offset:2px;opacity:1}
+.pc.flip{animation:flip .45s ease-out}
+@keyframes flip{from{transform:rotateY(90deg) scale(.9)}to{transform:rotateY(0) scale(1)}}
+
+/* ลูกเต๋า */
+.dice{width:min(240px,75vw);min-height:220px;margin:24px auto 15px;display:grid;place-items:center;border:1px solid #a78bfa35;border-radius:35px;background:radial-gradient(circle at 50% 0%,#8b5cf625,transparent 80%),#141b30;box-shadow:0 18px 40px #0004;color:#ddd6fe;font-size:155px;line-height:1}
+
+/* คำเดียวกัน */
+.words{display:grid;gap:13px;margin:23px 0}
+.words button{margin:0;border-radius:20px;background:linear-gradient(135deg,#252b50,#19223a);border:1px solid #818cf845;padding:25px 18px;font-size:27px}
+.words button.mine{outline:2px solid #a78bfa;outline-offset:3px;background:#5b21b6;opacity:1}
+
+/* หยุดเวลา */
+.target{text-align:center;margin:22px 0;color:var(--muted);font-size:16px}
+.target b{display:block;margin-top:8px;color:#c4b5fd;font-size:clamp(56px,15vw,78px);font-weight:800}
+.stopwrap{display:flex;justify-content:center;margin:27px 0}
+button.stopbtn{width:min(240px,70vw);height:auto;aspect-ratio:1;border-radius:50%;font-size:36px;margin:0;border:7px solid #ffffff10;box-shadow:0 0 0 10px #ffffff03,0 20px 45px #0005;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button.stopbtn:disabled{opacity:1}
+.stopbtn.count{background:linear-gradient(145deg,#312e81,#1e1b4b);color:#ddd6fe;font-size:110px}
+.stopbtn.go{background:linear-gradient(145deg,#fb7185,#e11d48)}
+.stopbtn.sent{background:linear-gradient(145deg,#059669,#065f46);font-size:24px}
+.stopbtn.watch{background:#19223a;color:#a8b2cc;font-size:20px}
+table.res{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;border-radius:17px;overflow:hidden;background:#141b30}
+.res th{background:#202944;color:#c4b5fd;font-size:13px}
+.res th,.res td{padding:13px 6px;text-align:center;overflow-wrap:anywhere}
+.res tr.loser td{color:#ff6b6b;font-weight:bold}
+.res tr.best td{color:#7ee8a2;font-weight:bold}
+
+/* หน้าลงโทษ */
+.modal{position:fixed;inset:0;background:#050816df;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:10;padding:18px}
+.box{background:linear-gradient(160deg,#202944,#11182b);color:var(--text);border:1px solid #ffffff20;border-radius:28px;padding:17px;text-align:center;width:100%;max-width:380px;max-height:90dvh;overflow:auto;box-shadow:0 25px 80px #0008}
+.box.anim{animation:pop .35s ease-out}
+.box img{width:100%;max-height:38dvh;object-fit:contain;background:#090d1b;border-radius:18px;display:block}
+.box .fallback{display:none;font-size:80px;line-height:1.3}
+.box .name{font-size:29px;font-weight:bold;margin:18px 0 0;color:#f8fafc;word-break:break-word}
+.box .ltime{font-size:15px;color:#c2cce3;line-height:1.8;margin-top:5px}
+.box .dek{font-size:43px;font-weight:900;color:#fb7185;margin:6px 0 4px;letter-spacing:1px}
+.box.anim .dek{animation:shake .5s 2}
+.box .mytime{font-size:13px;color:#b5bfd7;margin:8px 0 15px}
+.box > button{margin-top:13px;min-height:53px}
+.loss-box{width:min(100%,430px);max-height:calc(100dvh - 28px);padding:clamp(15px,4vw,24px);border-radius:24px}
+.loss-box img{height:clamp(145px,30dvh,280px);max-height:30dvh;object-fit:contain}
+.loss-box .loss-name{font-size:clamp(28px,7vw,38px);font-weight:900;line-height:1.2;margin:13px 0 5px;padding:12px 16px;color:#fff;background:linear-gradient(135deg,#be123c,#fb7185);border:1px solid #fecdd355;border-radius:18px;box-shadow:0 8px 24px #fb718533;overflow-wrap:anywhere;word-break:break-word}
+.loss-box .ltime{font-size:18px;font-weight:700;color:#fce7f3;margin-top:5px}
+.loss-box .dek{font-size:clamp(34px,9vw,44px);margin:7px 0 4px}
+.loss-box .mytime{font-size:15px;margin:7px 0 10px}
+@media(max-width:420px){.loss-box{width:100%;padding:15px;border-radius:21px}.loss-box img{height:clamp(130px,26dvh,220px);max-height:26dvh}.loss-box .loss-name{font-size:30px;padding:11px 12px}}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes shake{25%{transform:rotate(-5deg) scale(1.1)}75%{transform:rotate(5deg) scale(1.1)}}
+
+.flash{animation:flash .5s 3}
+@keyframes flash{50%{background:#e94560}}
+
+@media(max-width:360px){
+  body{padding:12px 10px 28px}
+  .game-grid{gap:9px}
+  button.game-tile{padding:15px 12px}
+  .game-title{font-size:16px}
+  .grid{gap:7px}
+  .pc{border-radius:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+
+/* ===== Neon lounge redesign ===== */
+:root{--bg:#070814;--panel:#101326;--text:#f7f5ff;--muted:#a8acc8;--line:rgba(171,157,255,.18);--purple:#a855f7;--cyan:#38bdf8;--green:#34d399;--pink:#f43f9e;--gold:#fbbf24}
+html{background:#070814}
+body{position:relative;isolation:isolate;padding:22px 16px 48px;background:radial-gradient(ellipse at 7% 4%,#7c3aed2b,transparent 34%),radial-gradient(ellipse at 96% 17%,#ec48991b,transparent 29%),radial-gradient(ellipse at 50% 100%,#2563eb12,transparent 42%),#070814}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.17;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+#app{max-width:650px}
+h1{letter-spacing:-1px;text-shadow:0 0 34px #a855f72b}
+h2{letter-spacing:-.4px;text-shadow:0 0 24px #a855f71c}
+.top{padding:11px 12px;background:linear-gradient(135deg,#14172de8,#0d1021e8);border-color:#a78bfa2b;box-shadow:0 12px 35px #0003}
+.top>div:first-child{font-size:13px}
+.top b{color:#f0abfc;text-shadow:0 0 14px #d946ef55}
+.top button{border-radius:11px}
+.players{border:1px solid #ffffff0a;background:linear-gradient(120deg,#17172dba,#101326ba);border-radius:14px;padding:12px 15px;color:#c3c8e3}
+input{background:#0d1022;border-color:#a5a1d31c;border-radius:15px;padding:16px 17px}
+input:focus{border-color:#c084fc;box-shadow:0 0 0 4px #a855f71e}
+button{background:linear-gradient(115deg,#d946ef,#8b5cf6 58%,#6366f1);box-shadow:0 8px 25px #8b5cf62a;border:1px solid #ffffff1c;border-radius:15px;font-weight:800;letter-spacing:.05px}
+button.alt{background:linear-gradient(135deg,#191d35,#11152a);border-color:#a5a1d32a;color:#e5e7ff}
+button:active:not(:disabled){transform:scale(.975)}
+.lobby-hero{position:relative;overflow:hidden;padding:30px 18px 27px;margin:16px 0 18px;border:1px solid #b07bff35;border-radius:28px;background:radial-gradient(ellipse at 100% 0%,#ec489929,transparent 48%),radial-gradient(ellipse at 0% 100%,#7c3aed24,transparent 48%),linear-gradient(145deg,#17152b,#0e1020 72%);box-shadow:0 20px 60px #0003,inset 0 1px #ffffff08}
+.lobby-hero:after{content:"🍻";position:absolute;right:13px;bottom:-20px;font-size:94px;opacity:.10;transform:rotate(-13deg);pointer-events:none}
+.lobby-badge{position:relative;z-index:1;padding:7px 13px;border-color:#e879f944;background:#c026d315;color:#f0abfc;letter-spacing:2.4px;box-shadow:0 0 22px #a855f714}
+.lobby-hero h1{position:relative;z-index:1;font-size:clamp(29px,7vw,39px);margin:14px 0 8px;background:linear-gradient(95deg,#fff 15%,#e9d5ff 58%,#f9a8d4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lobby-hero p{position:relative;z-index:1;font-size:14px;line-height:1.8;color:#b9bdd7}
+.game-grid{gap:12px;margin:0 0 15px}
+button.game-tile{min-height:182px;padding:17px 15px 16px;border-radius:21px;background:radial-gradient(circle at 100% 0%,var(--tile-glow),transparent 68%),linear-gradient(155deg,#171a31,#101326 78%);border-color:#ffffff14;box-shadow:0 10px 25px #0002,inset 0 1px #ffffff06;gap:8px}
+.game-tile:last-child{min-height:145px;grid-column:1/-1}
+.game-icon{width:52px;height:52px;border-radius:17px;background:linear-gradient(145deg,#ffffff13,#ffffff04);border-color:#ffffff14;font-size:29px;box-shadow:inset 0 1px #ffffff0a}
+.game-title{font-size:18px;letter-spacing:-.2px}
+.game-desc{font-size:12px;line-height:1.75;color:#b8bfd9}
+.game-arrow{color:#d8b4fe;font-size:22px}
+.lobby-note{padding:7px 4px;color:#777f9f;letter-spacing:.1px}
+.status{border-radius:15px;background:linear-gradient(130deg,#171a30,#101326);border-color:#ffffff12;box-shadow:inset 0 1px #ffffff05}
+.status.go{background:linear-gradient(120deg,#064e3b38,#0e292a);border-color:#34d3994a;color:#6ee7b7}
+.queue{padding:14px 9px;border-radius:18px;background:#ffffff04;border:1px solid #ffffff09}
+.queue span{border-radius:12px;background:#171b31;border-color:#ffffff12}
+.queue span.now{background:linear-gradient(135deg,#f0abfc,#a78bfa);color:#171027;box-shadow:0 0 23px #c084fc3d}
+.card{border:1px solid #ffffff60;box-shadow:0 22px 55px #0006,0 0 28px #a855f71a}
+.card.back{background:repeating-linear-gradient(45deg,#7c3aed 0 12px,#6d28d9 12px 24px);box-shadow:0 0 0 7px #8b5cf612,0 20px 50px #0005}
+.pc{border-radius:16px;transition:transform .18s,filter .18s}
+.pc.back{background:radial-gradient(circle at 50% 0%,#a855f72e,transparent 80%),linear-gradient(145deg,#1b2040,#11152a);border-color:#a78bfa35}
+.pc.safe{background:linear-gradient(145deg,#10b981,#047857);box-shadow:0 8px 22px #10b98125}
+.pc.bad{background:linear-gradient(145deg,#fb7185,#be123c);box-shadow:0 0 25px #fb71854d}
+.dice{border-color:#a78bfa42;border-radius:32px;background:radial-gradient(circle at 50% 0%,#a855f72a,transparent 80%),linear-gradient(145deg,#171a31,#0e1020);box-shadow:0 20px 45px #0004,0 0 30px #8b5cf714}
+.words button{background:linear-gradient(135deg,#252044,#171a31);border-color:#a78bfa38;box-shadow:0 9px 22px #0002}
+.words button.mine{background:linear-gradient(135deg,#7e22ce,#5b21b6);box-shadow:0 0 26px #a855f733}
+button.stopbtn{box-shadow:0 0 0 8px #ffffff05,0 20px 45px #0006,0 0 30px #a855f71c}
+.stopbtn.go{background:linear-gradient(145deg,#fb7185,#e11d48);box-shadow:0 0 0 8px #fb718511,0 0 40px #e11d4840}
+table.res{border:1px solid #ffffff10;border-radius:16px}
+.res th{background:#211d3d;color:#e9d5ff}
+.modal{background:#03040bdc}
+.box{background:radial-gradient(ellipse at 50% 0%,#a855f725,transparent 55%),linear-gradient(160deg,#20213b,#0e1122);border-color:#c084fc38;box-shadow:0 30px 100px #000b,0 0 40px #a855f71c}
+.box img{background:#080a17;border:1px solid #ffffff12}
+.box .dek{color:#fb7185;text-shadow:0 0 26px #fb718544}
+.offline-box{background:linear-gradient(135deg,#351827,#211322);border-color:#fb718550}
+button.clear-btn{background:linear-gradient(135deg,#e11d48,#be123c)}
+/* Entry screen */
+.join-shell{position:relative;margin:28px auto 0;padding:26px 21px 22px;border:1px solid #b07bff36;border-radius:28px;background:radial-gradient(ellipse at 100% 0%,#ec48991b,transparent 45%),radial-gradient(ellipse at 0% 100%,#7c3aed20,transparent 50%),linear-gradient(145deg,#17172d,#0e1020);box-shadow:0 24px 70px #0005,inset 0 1px #ffffff08;overflow:hidden}
+.join-logo{width:74px;height:74px;margin:0 auto 14px;display:grid;place-items:center;border:1px solid #e879f94d;border-radius:24px;background:linear-gradient(145deg,#a855f72b,#ec48991b);font-size:39px;box-shadow:0 0 35px #a855f71d}
+.join-title{text-align:center;font-size:clamp(30px,7vw,39px);font-weight:900;letter-spacing:-1px;background:linear-gradient(100deg,#fff,#e9d5ff 58%,#f9a8d4);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.35}
+.join-sub{text-align:center;color:#aeb4d1;font-size:13px;line-height:1.8;margin:6px 0 23px}
+.join-label{display:block;color:#d9d9f3;font-size:13px;font-weight:700;margin:10px 2px 2px}
+.join-shell input{margin:5px 0 10px}
+.join-shell #go{margin-top:9px;min-height:55px;font-size:16px;box-shadow:0 10px 28px #a855f73a}
+.join-foot{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:19px 0 2px;color:#8289a8;font-size:11px}
+.join-foot span{white-space:nowrap}
+@media(hover:hover){button.game-tile:hover{transform:translateY(-4px);border-color:#c084fc65;box-shadow:0 16px 32px #0004,0 0 25px #a855f710}button:hover:not(:disabled){filter:brightness(1.08)}}
+@media(max-width:420px){body{padding:13px 11px 30px}.lobby-hero{padding:25px 12px 22px;border-radius:23px}.game-grid{gap:9px}button.game-tile{min-height:172px;padding:14px 12px;border-radius:18px}.game-title{font-size:16px}.game-desc{font-size:11px}.join-shell{margin-top:17px;padding:23px 16px 19px}.join-logo{width:66px;height:66px;font-size:34px}.top{border-radius:15px}}
+
+
+
+/* Clean, friendly polish — keep the original simple layout and game flow */
+:root{--bg:#0b1020;--panel:#151d31;--text:#f4f7ff;--muted:#a8b4cc;--line:rgba(255,255,255,.11);--purple:#6478f5;--cyan:#65c7df;--green:#34d399}
+html{background:var(--bg)}
+body{padding:18px 14px 36px;background:radial-gradient(ellipse at 50% 0%,#24335a55,transparent 55%),var(--bg)}
+body:before{display:none}
+#app{max-width:560px}
+h1{letter-spacing:-.5px;text-shadow:none}
+h2{text-shadow:none}
+.top{background:#111a2d;border-color:var(--line);box-shadow:0 5px 18px #0002;backdrop-filter:none}
+.top b{color:#8ed9ec;text-shadow:none}
+.players{background:#111a2d;border-color:var(--line);color:#bdc8dc}
+input{background:#111a2d;border-color:#ffffff1a;border-radius:13px}
+input:focus{border-color:#7c8cf8;box-shadow:0 0 0 3px #7c8cf822}
+button{background:#6478f5;border:1px solid #8795ff55;border-radius:13px;box-shadow:0 4px 12px #0002;letter-spacing:0}
+button.alt{background:#1a263d;border-color:#ffffff19;color:#e1e9f8}
+button:active:not(:disabled){transform:scale(.985)}
+.lobby-hero{padding:24px 14px 21px;margin:16px 0;border:1px solid #ffffff13;border-radius:20px;background:#111a2d;box-shadow:0 8px 24px #0002}
+.lobby-hero:after{font-size:68px;right:8px;bottom:-15px;opacity:.07}
+.lobby-badge{border-color:#7184f544;background:#6478f51a;color:#c5ceff;letter-spacing:1.2px}
+.lobby-hero h1{font-size:clamp(28px,6vw,35px);margin:12px 0 6px;color:var(--text);background:none;-webkit-text-fill-color:currentColor}
+.lobby-hero p{color:var(--muted);line-height:1.75}
+.game-grid{gap:10px}
+button.game-tile{min-height:166px;padding:16px 14px;border-radius:17px;background:#131d32;border-color:#ffffff14;box-shadow:0 5px 14px #0002;gap:7px}
+.game-tile:last-child{min-height:132px}
+.game-icon{width:46px;height:46px;border-radius:14px;background:#202c45;border-color:#ffffff0e;box-shadow:none}
+.game-title{font-size:17px}
+.game-desc{color:#b2bfd5;line-height:1.65}
+.game-arrow{color:#aebcf3}
+.lobby-note{color:#929fb9;letter-spacing:0}
+.status{background:#131d32;border-color:#ffffff12;box-shadow:none}
+.status.go{background:#0d2a2b;border-color:#2b8b7180}
+.queue{background:#111a2d;border-color:#ffffff10}
+.queue span{background:#1a263d;border-color:#ffffff12}
+.queue span.now{background:#a9ddea;color:#10202a;box-shadow:none}
+.card{box-shadow:0 14px 35px #0004}
+.pc{border-radius:13px}
+.pc.back{background:#1b2945;border-color:#6d82b855}
+.pc.safe{box-shadow:none}.pc.bad{box-shadow:0 0 0 2px #fda4af}
+.dice{background:#131d32;border-color:#ffffff16;box-shadow:0 10px 28px #0003}
+.words button{background:#18243c;border-color:#7184f544;box-shadow:none}
+.words button.mine{background:#394a9b;box-shadow:none}
+button.stopbtn{box-shadow:0 12px 28px #0004}
+.stopbtn.go{box-shadow:0 12px 28px #e11d4830}
+table.res{border:1px solid #ffffff12}
+.res th{background:#202d48;color:#dbe5ff}
+.box{background:#151e32;border-color:#ffffff1c;box-shadow:0 22px 65px #0008}
+.box img{background:#0b1020;border-color:#ffffff12}
+.box .dek{text-shadow:none}
+.join-shell{margin:22px auto 0;padding:24px 20px 20px;border:1px solid #ffffff15;border-radius:21px;background:#111a2d;box-shadow:0 12px 30px #0003}
+.join-logo{width:65px;height:65px;border-radius:19px;border-color:#7184f544;background:#202b46;box-shadow:none}
+.join-title{font-size:clamp(29px,6.5vw,36px);background:none;-webkit-text-fill-color:var(--text);letter-spacing:-.5px}
+.join-sub{color:var(--muted);margin-bottom:20px}
+.join-label{color:#dce5f5}
+.join-shell #go{box-shadow:0 6px 16px #6478f52e}
+.join-foot{color:#8795af}
+@media(hover:hover){button.game-tile:hover{transform:translateY(-2px);border-color:#7184f566;box-shadow:0 9px 20px #0003}button:hover:not(:disabled){filter:brightness(1.06)}}
+@media(max-width:420px){body{padding:12px 10px 28px}.lobby-hero{padding:22px 12px 19px;border-radius:17px}.game-grid{gap:9px}button.game-tile{min-height:158px;padding:13px 11px;border-radius:15px}.game-title{font-size:15px}.game-desc{font-size:11px}.join-shell{margin-top:15px;padding:21px 15px 18px}.top{border-radius:14px}}
+
+
+.settings-box{max-width:390px;width:100%;padding:22px;text-align:left}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);font-size:15px}
+.setting-row input[type=checkbox]{width:22px;height:22px;accent-color:#8b5cf6;margin:0;flex:0 0 auto}
+.setting-row.volume-row{display:grid;grid-template-columns:1fr;gap:7px}
+.setting-row input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;height:38px;padding:0 4px;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;touch-action:none;cursor:pointer;user-select:none;-webkit-user-select:none}
+.setting-row input[type=range]:focus{outline:none;border:0;box-shadow:none}
+.setting-row input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:#394461}
+.setting-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-7px;border:0;border-radius:50%;background:#a78bfa;box-shadow:0 1px 5px #0008}
+.setting-row input[type=range]::-moz-range-track{height:8px;border-radius:999px;background:#394461}
+.setting-row input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:#a78bfa;box-shadow:0 1px 5px #0008}
+.settings-box .name{text-align:center;font-size:23px;font-weight:800}
+
+/* Final visual system: polished midnight lounge with clearer surfaces and spacing */
+:root{--bg:#080b18;--panel:#11162a;--text:#f7f8ff;--muted:#a8b1c9;--line:rgba(183,193,225,.14);--purple:#9273ff;--cyan:#72d5e8;--green:#55d6a0;--pink:#ff6486;--gold:#f3c969}
+html{background:var(--bg);color-scheme:dark}
+body{padding:clamp(14px,3vw,26px) 16px 42px;background:radial-gradient(ellipse at 50% -8%,#5443a82d,transparent 42%),radial-gradient(ellipse at 100% 48%,#1d78a012,transparent 38%),var(--bg)}
+#app{max-width:680px}
+h1{font-size:clamp(28px,6vw,38px);line-height:1.25;letter-spacing:-.6px}
+h2{font-size:clamp(22px,5vw,28px);line-height:1.35;margin:22px 0 14px}
+.top,.players,.status,.queue,.offline-box,.join-shell,.lobby-hero{border-color:var(--line);box-shadow:0 12px 34px #02040c55,inset 0 1px #ffffff08}
+.top{min-height:58px;padding:10px 12px;border-radius:17px;background:#111629eF}
+.top .btns{gap:8px}
+.top button{min-height:42px;padding:8px 13px;border-radius:12px;font-size:13px}
+.players{padding:13px 16px;margin:10px 0 14px;border-radius:15px;background:#111629}
+button{min-height:52px;border-radius:14px;background:linear-gradient(135deg,#7864e9,#5e65ce);border-color:#c6bdff35;box-shadow:0 8px 20px #29225b40;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+button.alt{background:#171d32;border-color:#ffffff18;color:#e6eaff;box-shadow:none}
+button:focus-visible,input:focus-visible{outline:3px solid #8ddbed;outline-offset:3px}
+.lobby-hero{padding:clamp(24px,5vw,38px) 18px clamp(21px,4vw,30px);margin:18px 0 20px;border-radius:25px;background:radial-gradient(ellipse at 100% 0%,#9678ff20,transparent 48%),linear-gradient(145deg,#151a31,#101426);box-shadow:0 18px 46px #02040c70,inset 0 1px #ffffff0a}
+.lobby-badge{font-size:10px;padding:7px 13px;border-color:#b3a1ff45;background:#8c70ff14;color:#d8ceff;letter-spacing:1.8px}
+.lobby-hero h1{margin:14px 0 7px;font-size:clamp(29px,7vw,40px)}
+.lobby-hero p{font-size:14px;line-height:1.8;color:#b4bdd4}
+.game-grid{gap:13px;margin-bottom:18px}
+button.game-tile{min-height:183px;padding:18px 17px 17px;border-radius:19px;background:radial-gradient(circle at 100% 0%,var(--tile-glow),transparent 72%),linear-gradient(155deg,#171c32,#111528 82%);border-color:#ffffff16;box-shadow:0 10px 26px #02040c55,inset 0 1px #ffffff09}
+.game-tile:last-child{min-height:148px}
+.game-icon{width:48px;height:48px;border-radius:15px;background:#ffffff0b;border-color:#ffffff13}
+.game-title{font-size:18px;line-height:1.35}
+.game-desc{color:#b6bfd4;line-height:1.65}
+.game-arrow{top:16px;right:16px;color:#d3caff}
+.status{padding:14px 16px;border-radius:15px;background:#141a2e}
+.status.go{background:linear-gradient(110deg,#0e302c,#112820);border-color:#55d6a044;color:#9af0c8}
+.queue{gap:9px;padding:13px 11px;border-radius:16px;background:#101528;border-color:#ffffff0d}
+.queue span{padding:8px 12px;border-radius:11px;background:#1a2036;border-color:#ffffff12}
+.queue span.now{background:linear-gradient(135deg,#b5a4ff,#8bd8e8);color:#101529;box-shadow:0 5px 16px #8671ff40}
+.join-shell{max-width:510px;margin:clamp(20px,7vh,60px) auto 0;padding:clamp(22px,5vw,34px);border-radius:25px;background:radial-gradient(ellipse at 50% 0%,#9273ff1a,transparent 52%),#111629}
+.join-logo{width:68px;height:68px;margin-bottom:13px;border-radius:21px;background:#8d73ff17;border-color:#b5a6ff36;box-shadow:0 8px 24px #0003}
+.join-title{font-size:clamp(30px,7vw,40px);line-height:1.3}
+.join-sub{font-size:14px;line-height:1.8;margin:8px 0 22px}
+.join-label{font-size:13px;color:#d7def0}
+.join-shell input{min-height:53px;border-radius:13px;background:#0c1121}
+.join-shell #go{margin-top:12px;min-height:56px}
+.join-foot{gap:8px 15px;margin-top:20px;color:#8e9ab4}
+.target{padding:22px 18px;margin:20px auto;max-width:440px;border:1px solid #ffffff12;border-radius:19px;background:linear-gradient(145deg,#151b31,#111629);box-shadow:0 10px 28px #02040c55}
+.target b{color:#d7ccff;font-size:clamp(56px,15vw,82px)}
+button.stopbtn{max-width:230px;border:6px solid #ffffff12}
+table.res{overflow:hidden;border:1px solid #ffffff13;border-radius:14px;background:#101528}
+.res th{padding:12px 8px;background:#1a2038;color:#d5ccff}
+.res td{padding:13px 8px;border-top:1px solid #ffffff0b}
+.res tr.loser td{color:#ff9cac}
+.res tr.best td{color:#89e5b7}
+.modal{padding:14px;background:#050711e8;backdrop-filter:blur(9px)}
+.box{max-width:410px;padding:20px;border-radius:22px;background:linear-gradient(155deg,#171d34,#101426);border-color:#ffffff1b;box-shadow:0 28px 90px #000a}
+.loss-box{width:min(100%,410px);max-height:calc(100dvh - 28px);padding:clamp(14px,4vw,22px);border-radius:23px}
+.loss-box img{height:clamp(125px,25dvh,230px);max-height:25dvh;border-radius:16px;background:#0b1020}
+.loss-box .loss-name{margin:12px 0 4px;padding:12px 16px;font-size:clamp(30px,7vw,40px);line-height:1.18;letter-spacing:.1px;border-radius:16px;background:linear-gradient(125deg,#a91e4e,#e94e76);box-shadow:0 8px 22px #d93d6733}
+.loss-box .ltime{font-size:17px;color:#ffdce5}
+.loss-box .dek{font-size:clamp(34px,9vw,42px);margin:5px 0 2px;color:#ff8298}
+.loss-box .mytime{margin:5px 0 8px;color:#b9c4da}
+.loss-box > button{margin-top:10px}
+.settings-box{max-width:440px;border-radius:22px}
+.lobby-hero:after{content:none}
+.game-art-frame{display:flex;align-items:center;justify-content:center;align-self:center;width:100%;height:clamp(112px,20vw,152px);flex:0 0 auto;margin:0 auto 3px;padding:4px;overflow:hidden;border:1px solid #e2e5ef;border-radius:15px;background:#f7f8fc}
+.game-art{display:block;width:100%;height:100%;max-width:100%;max-height:100%;flex:0 0 auto;margin:auto;object-fit:contain;object-position:50% 50%}
+.game-art-frame.word-art{height:clamp(90px,13vw,118px)}
+.game-art-frame.timer-art{align-self:center;width:min(100%,176px);height:auto;aspect-ratio:1}
+.game-art-frame.timer-art .game-art{width:100%;height:100%}
+.game-heading{display:flex;align-items:center;justify-content:center;gap:11px}
+.game-heading-art{width:58px;height:54px;object-fit:contain;padding:3px;border-radius:12px;background:#f7f8fc;box-shadow:0 4px 12px #0002}
+.game-heading-art.timer-heading-art{width:50px;height:48px}
+.join-logo{overflow:hidden;padding:5px;background:#f7f8fc}
+.join-logo{width:88px;height:88px;border-radius:24px}
+.join-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.lobby-note{font-size:12px}
+@media(max-width:480px){body{padding:12px 11px 28px}.top{gap:8px}.top .btns{width:100%;margin:2px 0 0}.top button{flex:1}.game-grid{gap:9px}button.game-tile{min-height:188px;padding:14px 12px;border-radius:16px}.game-art-frame{height:clamp(108px,28vw,132px)}.game-art-frame.word-art{height:clamp(88px,23vw,108px)}.game-tile:last-child{min-height:156px}.join-shell{margin-top:20px;padding:22px 16px}.join-logo{width:80px;height:80px}.game-heading-art{width:52px;height:48px}.loss-box{width:100%;padding:14px;border-radius:20px}.loss-box img{height:clamp(115px,22dvh,190px);max-height:22dvh}.loss-box .loss-name{font-size:30px;padding:11px 12px}}
+.game-tile:last-child{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:1fr 1fr;align-items:center;column-gap:15px;min-height:140px;padding:12px 18px}
+.game-tile:last-child>.game-art-frame{grid-column:1;grid-row:1/3;width:112px;height:112px;margin:0;align-self:center}
+.game-tile:last-child>.game-title{grid-column:2;grid-row:1;align-self:end;padding-right:28px}
+.game-tile:last-child>.game-desc{grid-column:2;grid-row:2;align-self:start;padding-right:22px}
+.game-tile:last-child>.game-arrow{top:14px;right:15px}
+.game-tile:last-child>.timer-art{width:112px;height:112px;aspect-ratio:1}
+@media(max-width:480px){.game-tile:last-child{min-height:126px;grid-template-columns:100px minmax(0,1fr);column-gap:12px;padding:10px 14px}.game-tile:last-child>.game-art-frame,.game-tile:last-child>.timer-art{width:100px;height:100px}.game-tile:last-child>.game-title{font-size:16px}.game-tile:last-child>.game-desc{font-size:11px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const app = document.getElementById('app');
+// เพิ่มรูปคนแพ้ได้โดยวางไฟล์ใน public แล้วเพิ่มชื่อในรายการนี้
+const PUNISH_IMAGES = ['/punish.png','/punish2.png']; 
+const PARTY_MUSIC = '/music.mp3'; // ใส่ไฟล์เพลงชื่อ music.mp3 ในโฟลเดอร์ public
+const SETTINGS_KEY = 'partySettings';
+// ปรับค่าเริ่มต้นเสียงเอฟเฟกต์ (0-100%) ได้ในรายการนี้
+const DEFAULT_SFX_VOLUMES = { tap: 100, card: 100, dice: 100, loss: 100, timer: 100 };
+// ปรับระดับเพลงพื้นหลังเริ่มต้น (0-100%) ที่ musicVolume
+let settings = { sound: true, vibration: true, music: false, musicVolume: 30, sfxVolumes: { ...DEFAULT_SFX_VOLUMES } };
+try {
+  const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  settings = { ...settings, ...saved, sfxVolumes: { ...DEFAULT_SFX_VOLUMES, ...(saved.sfxVolumes || {}) } };
+  settings.musicVolume = Math.max(0, Math.min(100, Number(settings.musicVolume) || 0));
+  for (const key of Object.keys(DEFAULT_SFX_VOLUMES)) settings.sfxVolumes[key] = Math.max(0, Math.min(100, Number(settings.sfxVolumes[key]) || 0));
+} catch (e) {}
+let currentPunishImage = PUNISH_IMAGES[0];
+let bgMusic = null;
+function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+function vibrate(pattern = 35) { if (settings.vibration && navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
+function sfx(kind = 'tap') {
+  if (!settings.sound) return;
+  try {
+    unlockAudio(); if (!actx || actx.state !== 'running') return;
+    const now = actx.currentTime;
+    const notes = kind === 'loss' ? [[440,0,.12],[330,.13,.14],[220,.29,.28]] : kind === 'dice' ? [[520,0,.05],[720,.06,.06],[920,.12,.08]] : kind === 'card' ? [[620,0,.06],[840,.055,.08]] : [[560,0,.045]];
+    const volume = (settings.sfxVolumes[kind] ?? 100) / 100;
+    notes.forEach(([freq, delay, dur]) => { const o=actx.createOscillator(), g=actx.createGain(); o.type=kind==='loss'?'triangle':'sine'; o.frequency.setValueAtTime(freq,now+delay); g.gain.setValueAtTime(.0001,now+delay); g.gain.exponentialRampToValueAtTime(Math.max(.0001,(kind==='loss'?.16:.075)*volume),now+delay+.012); g.gain.exponentialRampToValueAtTime(.0001,now+delay+dur); o.connect(g); g.connect(actx.destination); o.start(now+delay); o.stop(now+delay+dur+.02); });
+  } catch (e) {}
+}
+function initMusic() {
+  if (!bgMusic) { bgMusic = new Audio(PARTY_MUSIC); bgMusic.loop = true; bgMusic.preload = 'none'; bgMusic.addEventListener('error', () => { /* เพลงเป็นไฟล์เสริม */ }); }
+  bgMusic.volume = settings.musicVolume / 100;
+  if (settings.music) bgMusic.play().catch(() => {}); else bgMusic.pause();
+}
+function toggleSettings() {
+  const old = document.getElementById('settingsModal'); if (old) { old.remove(); return; }
+  const wrap = document.createElement('div'); wrap.id='settingsModal'; wrap.className='modal';
+  wrap.innerHTML = `<div class="box settings-box"><div class="name">⚙️ ตั้งค่าเกม</div><p class="muted" style="margin:10px 0 16px">ปรับเสียงแต่ละแบบได้ตามต้องการ</p>
+    <label class="setting-row"><span>🔊 เสียงเอฟเฟกต์</span><input id="setSound" type="checkbox" ${settings.sound?'checked':''}></label>
+    <label class="setting-row"><span>📳 สั่นเมื่อกด/ถึงคิว</span><input id="setVibration" type="checkbox" ${settings.vibration?'checked':''}></label>
+    <label class="setting-row"><span>🎵 เพลงพื้นหลัง</span><input id="setMusic" type="checkbox" ${settings.music?'checked':''}></label>
+    <label class="setting-row volume-row"><span>🎵 ระดับเพลงพื้นหลัง <b id="musicVolumeValue">${settings.musicVolume}%</b></span><input id="setMusicVolume" type="range" min="0" max="100" value="${settings.musicVolume}"></label>
+    ${[['tap','เสียงกด'],['card','เสียงเปิดไพ่'],['dice','เสียงลูกเต๋า'],['loss','เสียงแพ้'],['timer','เสียงจับเวลา']].map(([key,label])=>`<label class="setting-row volume-row"><span>${label} <b id="volumeValue-${key}">${settings.sfxVolumes[key]}%</b></span><input class="sfx-volume" data-kind="${key}" type="range" min="0" max="100" value="${settings.sfxVolumes[key]}"></label>`).join('')}
+    <p class="muted" style="font-size:12px;margin:12px 0">ถ้าจะเปิดเพลง ให้วางไฟล์ <b>music.mp3</b> ในโฟลเดอร์ public</p>
+    <button id="saveSettings">บันทึกการตั้งค่า</button><button class="alt" id="closeSettings">ปิด</button></div>`;
+  document.body.appendChild(wrap);
+  const musicSlider = document.getElementById('setMusicVolume');
+  musicSlider.oninput=()=>{ settings.musicVolume=Number(musicSlider.value); document.getElementById('musicVolumeValue').textContent=musicSlider.value+'%'; if (bgMusic) bgMusic.volume=settings.musicVolume/100; };
+  wrap.querySelectorAll('.sfx-volume').forEach(slider=>slider.oninput=()=>{ settings.sfxVolumes[slider.dataset.kind]=Number(slider.value); document.getElementById(`volumeValue-${slider.dataset.kind}`).textContent=slider.value+'%'; });
+  // Handle pointer drags ourselves so touch browsers that scroll the modal instead
+  // of dragging a styled native range still update the volume reliably.
+  wrap.querySelectorAll('input[type="range"]').forEach(slider=>{
+    let dragging=false;
+    const updateFromPointer=event=>{
+      const rect=slider.getBoundingClientRect();
+      const ratio=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
+      slider.value=Math.round(Number(slider.min||0)+ratio*(Number(slider.max||100)-Number(slider.min||0)));
+      slider.dispatchEvent(new Event('input',{bubbles:true}));
+    };
+    slider.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      dragging=true;
+      try{slider.setPointerCapture(event.pointerId);}catch(e){}
+      updateFromPointer(event);
+      event.preventDefault();
+    });
+    slider.addEventListener('pointermove',event=>{if(dragging){updateFromPointer(event);event.preventDefault();}});
+    const endDrag=()=>{dragging=false;};
+    slider.addEventListener('pointerup',endDrag);
+    slider.addEventListener('pointercancel',endDrag);
+  });
+  document.getElementById('saveSettings').onclick=()=>{ settings.sound=document.getElementById('setSound').checked; settings.vibration=document.getElementById('setVibration').checked; settings.music=document.getElementById('setMusic').checked; settings.musicVolume=Number(musicSlider.value); wrap.querySelectorAll('.sfx-volume').forEach(slider=>settings.sfxVolumes[slider.dataset.kind]=Number(slider.value)); saveSettings(); initMusic(); sfx('tap'); vibrate(25); wrap.remove(); };
+  document.getElementById('closeSettings').onclick=()=>wrap.remove();
+}
+
+const GAMES = {
+  cards: '🃏 เปิดไพ่',
+  survive: '😎 รอดหรือร่วง',
+  dice: '🎲 ทอยลูกเต๋า',
+  word: '🔤 กดคำเดียวกัน',
+  timer: '⏱️ หยุดเวลา',
+};
+const DICE = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+let room = null, myPick = null, lastRollId = 0, joined = false;
+let seen = new Set(), seenRound = null, lastTurnKey = null;
+let closedKey = null, shownKey = null, lastLossKey = null;
+
+let myId = sessionStorage.getItem('pid');
+if (!myId) {
+  myId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  sessionStorage.setItem('pid', myId);
+}
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const emit = (e, d) => socket.emit(e, d);
+const isRed = c => c.s === '♥' || c.s === '♦';
+const secs = ms => (ms / 1000).toFixed(2);
+const queueHtml = (online, turn) => online.map(p =>
+  `<span class="${p.id === turn ? 'now' : ''}">${esc(p.name)}${p.id === myId ? ' (คุณ)' : ''}</span>`).join('→');
+
+// ================= เสียง =================
+let actx = null;
+function unlockAudio() {
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state !== 'running') {
+      actx.resume();
+      const src = actx.createBufferSource();
+      src.buffer = actx.createBuffer(1, 1, 22050);
+      src.connect(actx.destination);
+      src.start(0);
+    }
+  } catch (e) {}
+}
+document.addEventListener('pointerdown', () => { unlockAudio(); if (settings.music) initMusic(); });
+document.addEventListener('touchend', unlockAudio);
+document.addEventListener('click', e => { if (e.target.closest('button') && !['rollBtn'].includes(e.target.id)) { /* เสียงเฉพาะเกมเรียกจาก handler */ } });
+
+function beep(when, dur, freq) {
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = 'square';
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, when);
+  const volume = (settings.sound ? settings.sfxVolumes.timer : 0) / 100;
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.25 * volume), when + 0.01);
+  g.gain.setValueAtTime(Math.max(0.0001, 0.25 * volume), when + dur - 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+  o.connect(g);
+  g.connect(actx.destination);
+  o.start(when);
+  o.stop(when + dur + 0.02);
+  return o;
+}
+
+// ================= เกมหยุดเวลา =================
+const LEAD = 60;
+const COUNT_MS = 2850;
+const tm = { roundId: null, phase: 'idle', count: '', goAt: 0, timers: [], osc: [] };
+
+function clearTimers() {
+  tm.timers.forEach(clearTimeout);
+  tm.timers = [];
+  tm.osc.forEach(o => { try { o.stop(); } catch (e) {} });
+  tm.osc = [];
+}
+const rerenderTimer = () => { if (room?.game === 'timer') render(); };
+
+function startCountdown() {
+  clearTimers();
+  unlockAudio();
+  const t0 = performance.now() + LEAD;
+  tm.goAt = t0 + COUNT_MS;
+  tm.phase = 'count';
+  tm.count = '3';
+  if (actx && actx.state === 'running') {
+    const t = actx.currentTime + LEAD / 1000;
+    tm.osc = [beep(t, 0.15, 880), beep(t + 1, 0.15, 880), beep(t + 2, 0.8, 1320)];
+  }
+  tm.timers.push(setTimeout(() => { tm.count = '2'; rerenderTimer(); }, LEAD + 1000));
+  tm.timers.push(setTimeout(() => { tm.count = '1'; rerenderTimer(); }, LEAD + 2000));
+  tm.timers.push(setTimeout(() => { tm.phase = 'go'; rerenderTimer(); }, LEAD + COUNT_MS));
+}
+
+function stopTime(e) {
+  const now = performance.now();
+  if (e) e.preventDefault();
+  if (tm.phase !== 'go') return;
+  tm.phase = 'sent';
+  emit('timer:stop', Math.max(0, now - tm.goAt));
+  render();
+}
+
+// ================= หาคนแพ้ =================
+function getLoss() {
+  if (!room) return null;
+  const s = room.state;
+
+  if (room.game === 'survive' && s.loser) {
+    return { key: 'survive:' + s.roundId, people: [{ name: s.loser.name }] };
+  }
+
+  if (room.game === 'word' && s.result?.type === 'lose') {
+    const r = s.result;
+    return {
+      key: 'word:' + s.set.cat + ':' + r.reveal.map(x => x.name + '=' + x.word).join('|'),
+      people: r.losers.map(n => ({
+        name: n,
+        sub: 'กด "' + esc(r.reveal.find(x => x.name === n)?.word || '') + '"',
+      })),
+    };
+  }
+
+  if (room.game === 'timer' && s.phase === 'result' && s.outcome.losers.length) {
+    const o = s.outcome;
+    const people = o.rows.filter(r => o.losers.includes(r.name)).map(r => ({
+      name: r.name,
+      sub: r.ms == null ? '—' : `${secs(r.ms)} วิ`,
+    }));
+    const myName = room.players.find(p => p.id === myId)?.name;
+    const me = o.rows.find(r => r.name === myName);
+    let mine = '';
+    if (me && !o.losers.includes(me.name)) {
+      mine = me.ms == null ? '—' : `${secs(me.ms)} วิ`;
+    }
+    return { key: 'timer:' + s.roundId, people, mine };
+  }
+
+  return null;
+}
+
+// ================= หน้าเข้าห้อง =================
+function renderJoin() {
+  const code = new URLSearchParams(location.search).get('room') || '';
+  app.innerHTML = `
+    <section class="join-shell">
+      <div class="join-logo" aria-hidden="true"><img src="/game-cards.png" alt=""></div>
+      <div class="join-title">วงเหล้า Party</div><button class="alt" style="margin:8px 0 14px" onclick="toggleSettings()">⚙️ ตั้งค่าเสียงและการสั่น</button>
+      <p class="join-sub">ปาร์ตี้เริ่มตรงนี้ 🎉<br>ตั้งชื่อ ใส่รหัสห้อง แล้วไปลุ้นกับเพื่อนกัน</p>
+      <label class="join-label" for="name">👤 ชื่อที่ใช้ในวง</label>
+      <input id="name" autocomplete="nickname" placeholder="ใส่ชื่อเล่นของมึง" maxlength="20" value="${esc(localStorage.getItem('name') || '')}">
+      <label class="join-label" for="code">🔑 รหัสห้อง</label>
+      <input id="code" autocomplete="off" placeholder="เช่น BEER หรือ 4ZONE" maxlength="6" value="${esc(code)}" style="text-transform:uppercase">
+      <button id="go">🚀 เข้าร่วมวง</button>
+      <p class="center muted" style="margin-top:12px;font-size:12px">ใส่รหัสห้องเดียวกันเพื่อเล่นด้วยกัน<br>ชื่อไม่ซ้ำกันจะช่วยให้ตามคิวได้ง่ายขึ้น</p>
+      <div class="join-foot"><span>5 เกมปาร์ตี้</span><span>เล่นกับเพื่อน</span><span>มือถือและคอม</span></div>
+    </section>`;
+  document.getElementById('go').onclick = () => {
+    unlockAudio();
+    const name = document.getElementById('name').value.trim();
+    const code = document.getElementById('code').value.trim().toUpperCase();
+    if (!name || !code) return alert('กรอกชื่อกับรหัสห้องด้วย');
+    localStorage.setItem('name', name);
+    history.replaceState(null, '', '?room=' + code);
+    joined = true;
+    emit('join', { name, code, pid: myId });
+  };
+}
+
+// ================= หน้าเกม =================
+function render() {
+  if (!room) return renderJoin();
+  const s = room.state;
+  const online = room.players.filter(p => p.online);
+  const offline = room.players.filter(p => !p.online);
+  const onlineIds = online.map(p => p.id);
+
+  if (room.game !== 'timer' && tm.roundId !== null) { clearTimers(); tm.roundId = null; tm.phase = 'idle'; }
+
+  let h = `
+    <div class="top">
+      <div>ห้อง <b>${esc(room.code)}</b></div>
+      <div class="btns">
+        ${room.game !== 'lobby' ? `<button class="alt" onclick="emit('selectGame','lobby')">← เลือกเกม</button>` : ''}
+        <button class="alt" onclick="toggleSettings()">⚙️ ตั้งค่า</button><button class="alt" onclick="leaveRoom()">ออก</button>
+      </div>
+    </div>
+    <div class="players">👥 ${online.length} คน: ${online.map(p => esc(p.name)).join(', ')}</div>`;
+
+  if (offline.length) {
+    h += `<div class="offline-box">
+      <div class="names">📴 หลุด ${offline.length} คน: ${offline.map(p => esc(p.name)).join(', ')}</div>
+      <button class="clear-btn" onclick="emit('kickOffline')">🧹 เคลียร์คนหลุดทั้งหมด</button>
+    </div>`;
+  }
+
+  // ---------- ล็อบบี้ (การ์ดเกมสไตล์ Arcade) ----------
+  if (room.game === 'lobby') {
+    const menu = [
+      { id: 'cards', image: '/game-cards.png', title: 'เปิดไพ่', desc: 'เปิดไปเรื่อยๆจนกว่าไพ่สิหมด', glow: '#8b5cf630' },
+      { id: 'survive', image: '/game-survive.png', title: 'รอดหรือร่วง', desc: 'ดี 15 ใบ แดก  1 ใบ แล้วแต่ไผสิได้', glow: '#10b98125' },
+      { id: 'dice', image: '/game-dice.png', title: 'ทอยลูกเต๋า', desc: 'กะเกมทอยลูกเต๋านั่นละ', glow: '#38bdf830' },
+      { id: 'word', image: '/game-word.png', title: 'คำเดียวกัน', desc: 'บักได๋กดแปลกกะแดกเหล้า', glow: '#f472b630' },
+      { id: 'timer', image: '/game-timer.png', title: 'หยุดเวลา', desc: 'นับในใจแล้วกะหยุด ช้าหลายกะเเดก เร็วหลายกะแดก', glow: '#f59e0b25' },
+    ];
+
+    h += `
+      <section class="lobby-hero">
+        <div class="lobby-badge">PARTY ARCADE</div>
+        <h1>พร้อมแล้วกะมาเล่น</h1>
+        <p>เลือกเกมละกะเล่นโลดสู</p>
+      </section>
+
+      <div class="game-grid">
+        ${menu.map(g => `
+          <button class="game-tile" style="--tile-glow:${g.glow}" onclick="emit('selectGame','${g.id}')">
+            <span class="game-arrow" aria-hidden="true">↗</span>
+            <span class="game-art-frame ${g.id === 'word' ? 'word-art' : ''} ${g.id === 'timer' ? 'timer-art' : ''}" aria-hidden="true"><img class="game-art" src="${g.image}" alt=""></span>
+            <span class="game-title">${g.title}</span>
+            <span class="game-desc">${g.desc}</span>
+          </button>
+        `).join('')}
+      </div>
+
+      <button class="alt" onclick="shareRoom()">🔗 ชวนเพื่อนเข้าห้อง</button>
+      <p class="lobby-note">เล่นผ่านมือถือของตัวเอง · ใช้รหัสห้องเดียวกัน</p>
+    `;
+  }
+
+  // ---------- เปิดไพ่ ----------
+  if (room.game === 'cards') {
+    h += `<h2 class="game-heading"><img class="game-heading-art" src="/game-cards.png" alt="">เปิดไพ่</h2><div class="center muted">เหลือ ${s.remaining}/52 ใบ</div>`;
+    if (s.current) {
+      h += `<div class="card ${isRed(s.current) ? 'red' : ''}"><div>${s.current.r}</div><div>${s.current.s}</div></div>
+            <div class="center muted">เปิดโดย ${esc(s.flippedBy)}</div>`;
+    } else {
+      h += `<div class="card back"></div>`;
+    }
+    if (s.history.length > 1) {
+      h += `<div class="hist">${s.history.slice(1).map(c => `<span class="${isRed(c) ? 'red' : ''}">${c.r}${c.s}</span>`).join('')}</div>`;
+    }
+    h += s.remaining > 0
+      ? `<button onclick="sfx('card');vibrate(35);emit('cards:flip')">เปิดไพ่</button>`
+      : `<div class="msg">หมดสำรับ จบเกม! 🎉</div>`;
+    h += `<button class="alt" onclick="confirm('สับไพ่ใหม่?')&&emit('cards:reset')">🔄 สับไพ่ใหม่</button>`;
+  }
+
+  // ---------- รอดหรือร่วง ----------
+  if (room.game === 'survive') {
+    if (seenRound !== s.roundId) { seen = new Set(); seenRound = s.roundId; }
+    const myTurn = !s.loser && s.turn === myId;
+    const turnName = room.players.find(p => p.id === s.turn)?.name || '';
+    const openedMap = {};
+    s.opened.forEach(o => openedMap[o.i] = o);
+
+    h += `<h2 class="game-heading"><img class="game-heading-art" src="/game-survive.png" alt="">รอดหรือร่วง</h2>
+      <div class="center muted">เปิดไปแล้ว ${s.opened.length}/${s.total} ใบ</div>
+      <div class="queue">คิว: ${queueHtml(online, s.loser ? null : s.turn)}</div>
+      <div class="grid">`;
+    for (let i = 0; i < s.total; i++) {
+      const o = openedMap[i];
+      if (o) {
+        const bad = s.loser?.card === i;
+        h += `<button class="pc ${bad ? 'bad' : 'safe'} ${seen.has(i) ? '' : 'flip'}" disabled>
+                <span>${bad ? '😵‍💫' : '😎'}</span><small>${esc(o.name)}</small></button>`;
+      } else {
+        h += `<button class="pc back" ${myTurn ? '' : 'disabled'} onclick="pickCard(${i})">?</button>`;
+      }
+    }
+    h += `</div>`;
+
+    if (s.loser) {
+      h += `<div class="msg lose">😵‍💫 ${esc(s.loser.name)} ร่วง!</div>
+            <button onclick="emit('survive:reset')">ตาใหม่</button>`;
+    } else if (myTurn) {
+      h += `<div class="status go">👉 ตาคุณ! เลือกมา 1 ใบ</div>`;
+    } else {
+      h += `<div class="status">⏳ ตาของ ${esc(turnName)}</div>
+            <button class="alt" onclick="skipTurn('survive')">⏭ ข้ามคิว</button>`;
+    }
+  }
+
+  // ---------- ลูกเต๋า ----------
+  if (room.game === 'dice') {
+    const myTurn = s.turn === myId;
+    const turnName = room.players.find(p => p.id === s.turn)?.name || '';
+    h += `<h2 class="game-heading"><img class="game-heading-art" src="/game-dice.png" alt="">ทอยลูกเต๋า</h2>
+      <div class="queue">คิว: ${queueHtml(online, s.turn)}</div>
+      <div class="center"><div class="dice" id="dice">${s.value ? DICE[s.value] : '🎲'}</div>
+      <div class="msg" id="diceText">${s.value ? `ได้ ${s.value}` : 'รอทอย'}</div>
+      ${s.by ? `<div class="muted">ทอยโดย ${esc(s.by)}</div>` : ''}</div>`;
+    h += myTurn
+      ? `<div class="status go">👉 ตาคุณทอย!</div><button id="rollBtn" onclick="rollDice()">🎲 ทอย!</button>`
+      : `<div class="status">⏳ ตาของ ${esc(turnName)}</div>
+         <button class="alt" onclick="skipTurn('dice')">⏭ ข้ามคิว</button>`;
+  }
+
+  // ---------- คำเดียวกัน ----------
+  if (room.game === 'word') {
+    const iPicked = s.pickedIds.includes(myId);
+    if (!iPicked && !s.result) myPick = null;
+    const pickedOnline = s.pickedIds.filter(id => onlineIds.includes(id)).length;
+    h += `<h2 class="game-heading"><img class="game-heading-art" src="/game-word.png" alt="">กดคำเดียวกัน</h2><div class="center muted">หมวด: ${esc(s.set.cat)}</div>
+      <div class="words">${s.set.words.map((w, i) =>
+        `<button class="${myPick === i ? 'mine' : ''}" ${iPicked || s.result ? 'disabled' : ''} onclick="pickWord(${i})">${esc(w)}</button>`
+      ).join('')}</div>
+      <div class="center muted">กดแล้ว ${pickedOnline}/${online.length} คน</div>`;
+    if (online.length < 3) h += `<div class="center muted">⚠️ เกมนี้ต้องมี 3 คนขึ้นไป</div>`;
+    if (s.result) {
+      const r = s.result;
+      if (r.type === 'lose') h += `<div class="msg lose">🍺 แดกกก!!: ${r.losers.map(esc).join(', ')}</div>`;
+      if (r.type === 'allSame') h += `<div class="msg">เหมือนกันหมด! เริ่มคำใหม่...</div>`;
+      if (r.type === 'tie') h += `<div class="msg">ไม่มีใครแพ้ เริ่มคำใหม่...</div>`;
+      h += `<div class="center muted">${r.reveal.map(x => `${esc(x.name)} → ${esc(x.word)}`).join('<br>')}</div>`;
+      if (r.type === 'lose') h += `<button onclick="emit('word:next')">คำต่อไป</button>`;
+    }
+  }
+
+  // ---------- หยุดเวลา ----------
+  if (room.game === 'timer') {
+    const inRound = s.participants.includes(myId);
+    const pressed = s.pressedIds.includes(myId) || (tm.roundId === s.roundId && tm.phase === 'sent');
+
+    if (s.phase === 'running' && tm.roundId !== s.roundId) {
+      tm.roundId = s.roundId;
+      if (inRound && !pressed) startCountdown();
+      else { clearTimers(); tm.phase = 'watch'; }
+    }
+    if (s.phase !== 'running' && (tm.phase === 'count' || tm.phase === 'go')) { clearTimers(); tm.phase = 'idle'; }
+
+    let mode;
+    if (s.phase !== 'running') mode = 'idle';
+    else if (!inRound) mode = 'watch';
+    else if (pressed) mode = 'sent';
+    else mode = (tm.phase === 'count' || tm.phase === 'go') ? tm.phase : 'watch';
+
+    h += `<h2 class="game-heading"><img class="game-heading-art timer-heading-art" src="/game-timer.png" alt="">หยุดเวลา</h2>`;
+    if (s.phase === 'idle') {
+      h += `<div class="center muted" style="margin:14px 0;line-height:1.7">
+        ระบบจะสุ่มเวลา 1–15 วิ<br>
+        ฟังเสียง ตุ๊ด · ตุ๊ด · ตี้ดดด แล้วเริ่มนับในใจ<br>
+        กดหยุดให้ใกล้เวลาที่สุด ใครห่างสุด โดน! 🍺<br>
+        <small>ถ้าไม่มีเสียง แตะหน้าจอ 1 ครั้งก่อนเริ่ม และเปิดเสียงมือถือ</small></div>`;
+    } else {
+      h += `<div class="target">เป้าหมาย<b>${s.target} วิ</b></div>`;
+    }
+
+    if (mode === 'count') {
+      h += `<div class="stopwrap"><button class="stopbtn count" disabled>${tm.count}</button></div>
+            <div class="status">เตรียมตัว...</div>`;
+    } else if (mode === 'go') {
+      h += `<div class="stopwrap"><button class="stopbtn go" onpointerdown="stopTime(event)">หยุด!</button></div>
+            <div class="status go">นับในใจ แล้วกด!</div>`;
+    } else if (mode === 'sent') {
+      h += `<div class="stopwrap"><button class="stopbtn sent" disabled>✅ กดแล้ว<br>รอเพื่อน</button></div>`;
+    } else if (mode === 'watch') {
+      h += `<div class="stopwrap"><button class="stopbtn watch" disabled>รอบนี้คุณ<br>ไม่ได้เล่น<br>รอรอบหน้า</button></div>`;
+    }
+
+    if (s.phase === 'running') {
+      h += `<div class="center muted">กดแล้ว ${s.pressedIds.length}/${s.participants.length} คน · เริ่มโดย ${esc(s.startedBy)}</div>`;
+    }
+
+    if (s.phase === 'result') {
+      const o = s.outcome;
+      h += `<div class="msg lose">⏱️ ห่างสุด: ${o.losers.map(esc).join(', ') || '-'}</div>
+        <table class="res"><tr><th>#</th><th>ชื่อ</th><th>เวลา</th></tr>
+        ${o.rows.map((r, i) => {
+          const lost = o.losers.includes(r.name);
+          const cls = lost ? 'loser' : i === 0 ? 'best' : '';
+          const t = r.ms == null ? '—' : secs(r.ms) + ' วิ';
+          return `<tr class="${cls}"><td>${lost ? '🍺' : i === 0 ? '🏆' : i + 1}</td><td>${esc(r.name)}</td><td>${t}</td></tr>`;
+        }).join('')}
+        </table>`;
+    }
+
+    if (s.phase !== 'running') {
+      if (online.length < 2) h += `<div class="center muted">⚠️ เกมนี้ต้องมี 2 คนขึ้นไป</div>`;
+      h += `<button onclick="emit('timer:start')">▶️ ${s.phase === 'result' ? 'เล่นอีกรอบ' : 'เริ่ม'}</button>`;
+    }
+  }
+
+  // ---------- หน้าลงโทษ ----------
+  const loss = getLoss();
+  if (loss && closedKey !== loss.key) {
+    const anim = shownKey !== loss.key;
+    shownKey = loss.key;
+    if (lastLossKey !== loss.key) currentPunishImage = PUNISH_IMAGES[Math.floor(Math.random() * PUNISH_IMAGES.length)];
+    h += `<div class="modal"><div class="box loss-box ${anim ? 'anim' : ''}">
+      <img src="${currentPunishImage}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div class="fallback">👉😆👈</div>
+      ${loss.people.map(p => `<div class="name loss-name">${esc(p.name)}</div>${p.sub ? `<div class="ltime">${p.sub}</div>` : ''}`).join('')}
+      <div class="dek">แดกกก!!</div>
+      ${loss.mine ? `<div class="mytime">${loss.mine}</div>` : ''}
+      <button onclick="closeModal()">ถัดไป ▶</button>
+    </div></div>`;
+  }
+
+  app.innerHTML = h;
+
+  if (room.game === 'dice' && s.rollId !== lastRollId) {
+    lastRollId = s.rollId;
+    if (s.value) {
+      const el = document.getElementById('dice'), t = document.getElementById('diceText');
+      t.textContent = 'กำลังทอย...';
+      const iv = setInterval(() => el.textContent = DICE[1 + Math.floor(Math.random() * 6)], 70);
+      setTimeout(() => { clearInterval(iv); el.textContent = DICE[s.value]; t.textContent = `ได้ ${s.value}`; }, 800);
+    }
+  }
+
+  if ((room.game === 'survive' || room.game === 'dice') && s.turn === myId && !s.loser) {
+    const key = room.game + ':' + (s.roundId || '') + ':' + (s.opened ? s.opened.length : s.rollId);
+    if (lastTurnKey !== key) { lastTurnKey = key; vibrate(150); }
+  }
+
+  if (room.game === 'survive') s.opened.forEach(o => seen.add(o.i));
+
+  const someoneLost = (loss && lastLossKey !== loss.key);
+  if (someoneLost) {
+    lastLossKey = loss.key;
+    document.body.classList.remove('flash'); void document.body.offsetWidth;
+    document.body.classList.add('flash');
+    vibrate([300, 100, 300]); sfx('loss');
+  }
+}
+
+// ================= ปุ่มต่างๆ =================
+function pickCard(i) {
+  sfx('card'); vibrate(35);
+  document.querySelectorAll('.pc.back').forEach(b => b.disabled = true);
+  emit('survive:pick', i);
+}
+function rollDice() {
+  sfx('dice'); vibrate([45, 35, 45]);
+  const b = document.getElementById('rollBtn');
+  if (b) b.disabled = true;
+  emit('dice:roll');
+}
+function skipTurn(game) {
+  const name = room.players.find(p => p.id === room.state.turn)?.name || '';
+  if (confirm('ข้ามคิว ' + name + '?')) emit(game + ':skip');
+}
+function pickWord(i) { myPick = i; emit('word:pick', i); }
+function closeModal() {
+  sfx('tap'); vibrate(25);
+  const l = getLoss();
+  if (l) closedKey = l.key;
+  render();
+}
+function leaveRoom() {
+  if (!confirm('ออกจากห้อง?')) return;
+  emit('leave');
+  clearTimers();
+  joined = false;
+  room = null;
+  renderJoin();
+}
+async function shareRoom() {
+  const url = new URL(location.href);
+  if (room?.code) url.searchParams.set('room', room.code);
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: 'มาเล่นเกมด้วยกัน', text: `เข้าห้อง ${room?.code || ''} มาเล่นด้วยกัน!`, url: url.href });
+      return;
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(url.href);
+      alert('คัดลอกลิงก์แล้ว ส่งให้เพื่อนได้เลย');
+      return;
+    }
+    prompt('คัดลอกลิงก์นี้ส่งให้เพื่อน', url.href);
+  } catch (error) {
+    if (error.name !== 'AbortError') prompt('คัดลอกลิงก์นี้ส่งให้เพื่อน', url.href);
+  }
+}
+
+socket.on('you', id => { myId = id; sessionStorage.setItem('pid', id); });
+socket.on('room', r => { if (!joined) return; room = r; render(); });
+socket.on('err', m => alert(m));
+socket.on('connect', () => {
+  const code = new URLSearchParams(location.search).get('room');
+  const name = localStorage.getItem('name');
+  if (joined && code && name) emit('join', { code, name, pid: myId });
+});
+
+renderJoin();
+</script>
+</body>
+</html>
