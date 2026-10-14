@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { randomInt } = require('crypto');
 const WORD_SETS = require('./words');
+const TABOO_WORDS = require('./taboo-words');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,7 +17,7 @@ const LEAVE_GRACE_MS = 60000;      // คนหลุดจะถูกลบอ
 const TIMER_MIN = 1, TIMER_MAX = 15; // เกมหยุดเวลา: สุ่ม 1-15 วิ
 const TIMER_COUNTDOWN_MS = 2850;   // ช่วง 3-2-1 + ตี้ดยาว
 const TIMER_EXTRA_MS = 10000;      // เลยเป้าหมายไปแล้ว 10 วิ ยังไม่กด = แพ้
-const GAMES = ['lobby', 'cards', 'survive', 'dice', 'word', 'timer'];
+const GAMES = ['lobby', 'cards', 'survive', 'dice', 'word', 'taboo', 'timer'];
 const rooms = {};
 let roundSeq = 0;
 
@@ -78,6 +79,33 @@ function newWordRound(room) {
   room.lastCat = set.cat;
   room.secret.picks = {};
   room.state = { set: { cat: set.cat, words: shuffle([...set.words]) }, pickedIds: [], result: null };
+}
+
+// ---------- คำต้องห้าม ----------
+function newTabooRound(room) {
+  const ids = activeIds(room);
+  room.tabooLastWords ||= {};
+  const recentlyUsed = new Set(Object.values(room.tabooLastWords));
+  const words = shuffle([...new Set(TABOO_WORDS)].filter(word => !recentlyUsed.has(word)));
+  if (words.length < ids.length) return false;
+  room.secret.tabooWords = Object.fromEntries(ids.map((id, i) => [id, words[i]]));
+  Object.assign(room.tabooLastWords, room.secret.tabooWords);
+  room.state = { roundId: ++roundSeq, participants: ids, status: 'playing', mode: 'random', losers: [] };
+  return true;
+}
+
+function startCustomTabooIfReady(room) {
+  const s = room.state;
+  const entries = room.secret.tabooCustomWords || {};
+  const ids = s.participants.filter(id => !!room.players[id]);
+  s.participants = ids;
+  if (!ids.length || !ids.every(id => entries[id])) return false;
+  room.secret.tabooWords = Object.fromEntries(ids.map(id => [id, entries[id]]));
+  Object.assign(room.tabooLastWords ||= {}, room.secret.tabooWords);
+  s.roundId = ++roundSeq;
+  s.status = 'playing';
+  s.losers = [];
+  return true;
 }
 
 function checkWord(room) {
@@ -178,20 +206,35 @@ function initGame(room, game) {
   if (game === 'survive') newSurviveRound(room);
   if (game === 'dice') room.state = { value: null, by: null, rollId: 0, turn: nextTurn(room, null) };
   if (game === 'word') newWordRound(room);
+  if (game === 'taboo') {
+    room.state = { roundId: null, participants: activeIds(room), status: 'mode', mode: null, losers: [] };
+  }
   if (game === 'timer') room.state = timerIdle();
 }
 
-function publicRoom(r) {
+function publicRoom(r, playerId) {
   return {
     code: r.code,
     game: r.game,
-    state: r.state,
+    state: r.game === 'taboo' ? {
+      roundId: r.state.roundId,
+      status: r.state.status,
+      mode: r.state.mode,
+      losers: r.state.losers,
+      isParticipant: !!r.state.participants?.includes(playerId),
+      myWord: r.state.status === 'playing' ? r.secret.tabooWords?.[playerId] || null : null,
+      submittedCount: r.state.status === 'setup' ? Object.keys(r.secret.tabooCustomWords || {}).filter(id => r.state.participants?.includes(id)).length : 0,
+      participantCount: r.state.participants?.length || 0,
+      hasSubmitted: !!r.secret.tabooCustomWords?.[playerId],
+    } : r.state,
     players: Object.entries(r.players).map(([id, p]) => ({ id, name: p.name, online: !!p.sid })),
   };
 }
 
 function broadcast(room) {
-  io.to(room.code).emit('room', publicRoom(room));
+  for (const [id, player] of Object.entries(room.players)) {
+    if (player.sid) io.to(player.sid).emit('room', publicRoom(room, id));
+  }
 }
 
 // เช็กสถานะเกมใหม่ทุกครั้งที่มีคนเข้า/ออก/หลุด
@@ -205,6 +248,7 @@ function refresh(room) {
     checkWord(room);
   }
   if (room.game === 'timer') checkTimer(room);
+  if (room.game === 'taboo' && room.state.status === 'setup') startCustomTabooIfReady(room);
 }
 
 function removePlayer(room, pid) {
@@ -369,6 +413,49 @@ io.on('connection', socket => {
   socket.on('word:next', () => {
     if (!ok('word')) return;
     newWordRound(room);
+    broadcast(room);
+  });
+
+  // ---- คำต้องห้าม ----
+  socket.on('taboo:mode', mode => {
+    if (!ok('taboo') || room.state.status !== 'mode' || !room.state.participants.includes(pid)) return;
+    room.state.participants = activeIds(room);
+    if (mode === 'random') {
+      if (!newTabooRound(room)) return socket.emit('err', 'จำนวนผู้เล่นมากเกินกว่าชุดคำที่มี');
+    } else if (mode === 'custom') {
+      room.secret.tabooWords = {};
+      room.secret.tabooCustomWords = {};
+      room.state.mode = 'custom';
+      room.state.status = 'setup';
+    } else return;
+    broadcast(room);
+  });
+  socket.on('taboo:submitWord', input => {
+    if (!ok('taboo') || room.state.status !== 'setup' || !room.state.participants.includes(pid)) return;
+    const word = String(input || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    if (!word) return socket.emit('err', 'พิมพ์คำก่อนกดยืนยัน');
+    room.secret.tabooCustomWords ||= {};
+    if (room.secret.tabooCustomWords[pid]) return;
+    room.secret.tabooCustomWords[pid] = word;
+    startCustomTabooIfReady(room);
+    broadcast(room);
+  });
+  socket.on('taboo:lose', () => {
+    if (!ok('taboo')) return;
+    const s = room.state;
+    const word = room.secret.tabooWords?.[pid];
+    if (s.status !== 'playing' || !s.participants.includes(pid) || !word) return;
+    s.status = 'ended';
+    s.losers = [{ name: nameOf(room, pid), word }];
+    broadcast(room);
+  });
+  socket.on('taboo:next', () => {
+    if (!ok('taboo')) return;
+    if (room.state.mode === 'custom') {
+      room.secret.tabooWords = {};
+      room.secret.tabooCustomWords = {};
+      room.state = { roundId: null, participants: activeIds(room), status: 'setup', mode: 'custom', losers: [] };
+    } else if (!newTabooRound(room)) return socket.emit('err', 'ยังไม่มีชุดคำที่รองรับจำนวนผู้เล่นตอนนี้');
     broadcast(room);
   });
 
