@@ -345,6 +345,24 @@ table.res{overflow:hidden;border:1px solid #ffffff13;border-radius:14px;backgrou
 .loss-box .dek{font-size:clamp(34px,9vw,42px);margin:5px 0 2px;color:#ff8298}
 .loss-box .mytime{margin:5px 0 8px;color:#b9c4da}
 .loss-box > button{margin-top:10px}
+.loss-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.loss-actions button{min-height:52px;margin:0;padding:10px 8px;font-size:clamp(15px,4vw,18px)}
+.loss-actions .fate-btn{background:linear-gradient(135deg,#374151,#1f2937);border-color:#ffffff20}
+.loss-actions .risk-btn{background:linear-gradient(135deg,#f59e0b,#e11d48);box-shadow:0 8px 24px #e11d4840}
+.roulette-stage{position:relative;width:min(100%,380px);aspect-ratio:1;margin:16px auto 20px;padding:10px;border-radius:50%;background:conic-gradient(from 20deg,#fbbf24,#fb7185,#a78bfa,#38bdf8,#34d399,#fbbf24);box-shadow:0 0 0 2px #ffffff45,0 0 48px #a855f799,0 14px 38px #0009;isolation:isolate}
+.roulette-stage:after{content:"";position:absolute;z-index:3;inset:2px;border-radius:50%;background:repeating-conic-gradient(from 0deg,#fff 0deg 2deg,transparent 2deg 30deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));animation:roulette-lights .55s steps(2,end) infinite;pointer-events:none}
+.roulette-wheel{position:relative;z-index:1;width:100%;height:100%;overflow:hidden;border:7px solid #fff;border-radius:50%;background:conic-gradient(#f43f5e 0deg 60deg,#f59e0b 60deg 120deg,#8b5cf6 120deg 180deg,#06b6d4 180deg 240deg,#22c55e 240deg 300deg,#ec4899 300deg 360deg);box-shadow:inset 0 0 24px #fff5,0 0 0 3px #ffffff40,0 12px 30px #0009}
+.roulette-wheel.spinning{animation:roulette-spin 3.8s cubic-bezier(.08,.78,.12,1) forwards,roulette-pulse .65s ease-in-out infinite alternate}
+.roulette-wheel:after{content:"";position:absolute;left:50%;top:50%;width:27%;aspect-ratio:1;transform:translate(-50%,-50%);border:4px solid #fff;border-radius:50%;background:linear-gradient(145deg,#34334f,#111827);box-shadow:0 0 0 4px #ffffff38,0 2px 12px #0009}.roulette-wheel:before{content:"ลุ้น!";position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(17px,5vw,22px);font-weight:1000;text-shadow:0 2px 8px #000;pointer-events:none}
+.roulette-label{position:absolute;width:90px;color:#fff;text-align:center;font-size:clamp(12px,3.3vw,15px);font-weight:1000;line-height:1.15;text-shadow:0 2px 5px #000b;z-index:1;filter:drop-shadow(0 1px 2px #0008)}
+.roulette-label:nth-child(1){top:16%;right:13%}.roulette-label:nth-child(2){top:42%;right:2%}.roulette-label:nth-child(3){bottom:17%;right:12%}.roulette-label:nth-child(4){bottom:17%;left:12%}.roulette-label:nth-child(5){top:42%;left:2%}.roulette-label:nth-child(6){top:16%;left:13%}
+.roulette-pointer{position:absolute;z-index:3;top:-8px;left:50%;transform:translateX(-50%);color:#fef08a;font-size:42px;line-height:1;text-shadow:0 3px 0 #9a3412,0 5px 12px #000b}
+@keyframes roulette-spin{to{transform:rotate(var(--wheel-end,1800deg))}}@keyframes roulette-lights{to{filter:brightness(1.7) drop-shadow(0 0 7px #fff)}}@keyframes roulette-pulse{to{filter:saturate(1.35) brightness(1.1)}}
+.roulette-caption{font-weight:800;color:#fde68a;font-size:19px;margin:8px 0}
+.roulette-result-image{display:block;width:auto;max-width:100%;height:auto;max-height:min(48dvh,400px);object-fit:contain;margin:0 auto;border-radius:16px;background:#fff}
+.roulette-result-text{margin:8px 0;color:#fff;font-size:clamp(23px,6vw,32px);font-weight:900}
+.roulette-choose-list{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-height:150px;overflow:auto;margin:10px 0}
+.roulette-choose-list button{flex:0 1 180px;margin:0;min-height:44px;padding:8px;font-size:15px}
 .settings-box{max-width:440px;border-radius:22px}
 .lobby-hero:after{content:none}
 .game-art-frame{display:flex;align-items:center;justify-content:center;align-self:center;width:100%;height:clamp(112px,20vw,152px);flex:0 0 auto;margin:0 auto 3px;padding:4px;overflow:hidden;border:1px solid #e2e5ef;border-radius:15px;background:#f7f8fc}
@@ -376,6 +394,11 @@ table.res{overflow:hidden;border:1px solid #ffffff13;border-radius:14px;backgrou
 .taboo-word{display:block;max-width:100%;color:#fff;font-size:clamp(78px,26vw,136px);font-weight:900;line-height:1.04;white-space:nowrap;overflow-wrap:normal;writing-mode:horizontal-tb;text-orientation:mixed;letter-spacing:.01em;text-shadow:0 4px 20px #a855f766}
 .taboo-status{padding:13px 15px;border:1px solid #ffffff12;border-radius:15px;background:#ffffff08;color:#cbd5e1;text-align:center;line-height:1.65;margin:10px 0 14px}
 .taboo-status.ended{color:#fecdd3;background:#88133735;border-color:#fb718544}
+.taboo-winner-overlay{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;padding:18px;background:#050816e8;backdrop-filter:blur(10px)}
+.taboo-winner-card{width:min(100%,440px);max-height:92dvh;overflow:auto;padding:18px;border:1px solid #fbbf2466;border-radius:26px;background:radial-gradient(ellipse at 50% 0%,#fbbf2428,transparent 60%),linear-gradient(155deg,#20243a,#101426);box-shadow:0 28px 90px #000b,0 0 42px #fbbf2430;text-align:center;animation:pop .4s ease-out}
+.taboo-winner-card img{display:block;width:100%;max-height:48dvh;object-fit:contain;margin:0 auto 8px;border-radius:18px;background:#fff}
+.taboo-winner-name{color:#fff;font-size:clamp(30px,8vw,44px);font-weight:1000;line-height:1.15;overflow-wrap:anywhere;text-shadow:0 3px 18px #fbbf2466}
+.taboo-winner-text{margin:7px 0 12px;color:#fbbf24;font-size:clamp(24px,6vw,32px);font-weight:1000}
 button.taboo-lose{background:linear-gradient(135deg,#e11d48,#be123c);font-size:19px;min-height:58px;box-shadow:0 8px 24px #e11d4833}
 .taboo-card>button.taboo-lose{grid-column:2;width:50px;height:50px;min-height:50px;margin:0;padding:0;border-radius:50%;font-size:12px;line-height:1;white-space:nowrap}
 .taboo-confirm{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;background:#050816e8;backdrop-filter:blur(9px)}
@@ -432,53 +455,181 @@ button.taboo-lose{background:linear-gradient(135deg,#e11d48,#be123c);font-size:1
 const socket = io();
 const app = document.getElementById('app');
 // เพิ่มรูปคนแพ้ได้โดยวางไฟล์ใน public แล้วเพิ่มชื่อในรายการนี้
-const PUNISH_IMAGES = ['/punish.png','/punish2.png']; 
-const PARTY_MUSIC = '/music.mp3'; // ใส่ไฟล์เพลงชื่อ music.mp3 ในโฟลเดอร์ public
-const SETTINGS_KEY = 'partySettings';
-// ปรับค่าเริ่มต้นเสียงเอฟเฟกต์ (0-100%) ได้ในรายการนี้
-const DEFAULT_SFX_VOLUMES = { tap: 100, card: 100, dice: 100, loss: 100, timer: 100 };
-// ปรับระดับเพลงพื้นหลังเริ่มต้น (0-100%) ที่ musicVolume
-let settings = { sound: true, vibration: true, music: false, musicVolume: 30, sfxVolumes: { ...DEFAULT_SFX_VOLUMES } };
+const PUNISH_IMAGES = ['/punish.png','/punish2.png'];
+const ROULETTE_OUTCOMES = [
+  { label: '1 เป๊ก', image: '/roulette-peck-1.png' },
+  { label: '2 เป๊ก', image: '/roulette-peck-2.png' },
+  { label: 'คนขวา 1 เป๊ก', image: '/roulette-right.png' },
+  { label: 'คนซ้าย 1 เป๊ก', image: '/roulette-left.png' },
+  { label: 'รอด', image: '/roulette-safe.png' },
+  { label: 'เลือกคนยก 1 เป๊ก', image: '/roulette-choose.png' },
+];
+const GAME_MUSIC = {
+  cards: '/music-cards.mp3',
+  survive: '/music-survive.mp3',
+  dice: '/music-dice.mp3',
+  word: '/music-word.mp3',
+  taboo: '/music-taboo.mp3',
+  timer: '/music-timer.mp3',
+};
+const SETTINGS_KEY = 'partyAudioSettingsV2';
+let settings = { musicEnabled: true, musicVolume: 15, gameSoundEnabled: true, gameSoundVolume: 100 };
 try {
   const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-  settings = { ...settings, ...saved, sfxVolumes: { ...DEFAULT_SFX_VOLUMES, ...(saved.sfxVolumes || {}) } };
+  settings = { ...settings, ...saved };
   settings.musicVolume = Math.max(0, Math.min(100, Number(settings.musicVolume) || 0));
-  for (const key of Object.keys(DEFAULT_SFX_VOLUMES)) settings.sfxVolumes[key] = Math.max(0, Math.min(100, Number(settings.sfxVolumes[key]) || 0));
+  settings.gameSoundVolume = Math.max(0, Math.min(100, Number(settings.gameSoundVolume) || 0));
 } catch (e) {}
+const LOSS_ANNOUNCEMENT_SOUND = '/game-over.mp3';
+const TABOO_WIN_SOUND = '/win.mp3';
 let currentPunishImage = PUNISH_IMAGES[0];
-let bgMusic = null;
+let gameMusic = null, currentMusicTrack = null;
+let activeWheelSoundKey = null, wheelSoundTimeout = null, wheelSoundStep = 0, lastWheelResultKey = null;
+let prioritySoundQueue = [], priorityAudio = null, prioritySoundPlaying = false, resumeMusicAfterPriority = false, priorityPausedForWheel = false;
+let lastTabooWinnerSoundKey = null;
+const activeSoundOscillators = new Set();
 function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
-function vibrate(pattern = 35) { if (settings.vibration && navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
+let activeClickSound = null;
+function trackSoundOscillator(oscillator) {
+  activeSoundOscillators.add(oscillator);
+  oscillator.addEventListener('ended', () => activeSoundOscillators.delete(oscillator), { once: true });
+  return oscillator;
+}
+function stopTransientGameSounds() {
+  for (const oscillator of activeSoundOscillators) { try { oscillator.stop(); } catch (e) {} }
+  activeSoundOscillators.clear();
+}
+function playNextPrioritySound() {
+  if (activeWheelSoundKey) return;
+  if (!prioritySoundQueue.length) {
+    prioritySoundPlaying = false;
+    priorityAudio = null;
+    if (resumeMusicAfterPriority) { resumeMusicAfterPriority = false; syncGameMusic(); }
+    return;
+  }
+  if (gameMusic && !gameMusic.paused) { resumeMusicAfterPriority = true; gameMusic.pause(); }
+  stopTransientGameSounds();
+  prioritySoundPlaying = true;
+  const audio = new Audio(prioritySoundQueue.shift());
+  priorityAudio = audio;
+  audio.preload = 'auto';
+  audio.volume = settings.gameSoundEnabled ? settings.gameSoundVolume / 100 : 0;
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    audio.removeEventListener('ended', finish);
+    audio.removeEventListener('error', finish);
+    if (priorityAudio === audio) priorityAudio = null;
+    prioritySoundPlaying = false;
+    playNextPrioritySound();
+  };
+  audio.addEventListener('ended', finish);
+  audio.addEventListener('error', finish);
+  audio.play().catch(finish);
+}
+function queuePrioritySound(path) {
+  if (!settings.gameSoundEnabled || settings.gameSoundVolume <= 0) return;
+  prioritySoundQueue.push(path);
+  if (!prioritySoundPlaying) playNextPrioritySound();
+}
 function sfx(kind = 'tap') {
-  if (!settings.sound) return;
+  if (activeClickSound) activeClickSound.played = true;
+  if (activeWheelSoundKey || prioritySoundPlaying || !settings.gameSoundEnabled || settings.gameSoundVolume <= 0) return;
   try {
     unlockAudio(); if (!actx || actx.state !== 'running') return;
     const now = actx.currentTime;
     const notes = kind === 'loss' ? [[440,0,.12],[330,.13,.14],[220,.29,.28]] : kind === 'dice' ? [[520,0,.05],[720,.06,.06],[920,.12,.08]] : kind === 'card' ? [[620,0,.06],[840,.055,.08]] : [[560,0,.045]];
-    const volume = (settings.sfxVolumes[kind] ?? 100) / 100;
-    notes.forEach(([freq, delay, dur]) => { const o=actx.createOscillator(), g=actx.createGain(); o.type=kind==='loss'?'triangle':'sine'; o.frequency.setValueAtTime(freq,now+delay); g.gain.setValueAtTime(.0001,now+delay); g.gain.exponentialRampToValueAtTime(Math.max(.0001,(kind==='loss'?.16:.075)*volume),now+delay+.012); g.gain.exponentialRampToValueAtTime(.0001,now+delay+dur); o.connect(g); g.connect(actx.destination); o.start(now+delay); o.stop(now+delay+dur+.02); });
+    const volume = settings.gameSoundVolume / 100;
+    notes.forEach(([freq, delay, dur]) => { const o=trackSoundOscillator(actx.createOscillator()), g=actx.createGain(); o.type=kind==='loss'?'triangle':'sine'; o.frequency.setValueAtTime(freq,now+delay); g.gain.setValueAtTime(.0001,now+delay); g.gain.exponentialRampToValueAtTime(Math.max(.0001,(kind==='loss'?.16:.075)*volume),now+delay+.012); g.gain.exponentialRampToValueAtTime(.0001,now+delay+dur); o.connect(g); g.connect(actx.destination); o.start(now+delay); o.stop(now+delay+dur+.02); });
   } catch (e) {}
 }
-function initMusic() {
-  if (!bgMusic) { bgMusic = new Audio(PARTY_MUSIC); bgMusic.loop = true; bgMusic.preload = 'none'; bgMusic.addEventListener('error', () => { /* เพลงเป็นไฟล์เสริม */ }); }
-  bgMusic.volume = settings.musicVolume / 100;
-  if (settings.music) bgMusic.play().catch(() => {}); else bgMusic.pause();
+function playWheelTick(step) {
+  if ((prioritySoundPlaying && !priorityPausedForWheel) || !settings.gameSoundEnabled || settings.gameSoundVolume <= 0 || !actx || actx.state !== 'running') return;
+  const now = actx.currentTime, volume = settings.gameSoundVolume / 100;
+  const o = trackSoundOscillator(actx.createOscillator()), g = actx.createGain();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(Math.max(240, 640 - step * 15), now);
+  g.gain.setValueAtTime(.0001, now);
+  g.gain.exponentialRampToValueAtTime(.055 * volume, now + .006);
+  g.gain.exponentialRampToValueAtTime(.0001, now + .045);
+  o.connect(g); g.connect(actx.destination); o.start(now); o.stop(now + .05);
+}
+function stopWheelSound() {
+  if (wheelSoundTimeout) clearTimeout(wheelSoundTimeout);
+  wheelSoundTimeout = null;
+  activeWheelSoundKey = null;
+  if (priorityPausedForWheel && priorityAudio) {
+    priorityPausedForWheel = false;
+    priorityAudio.play().catch(() => {});
+  } else if (prioritySoundQueue.length && !prioritySoundPlaying) {
+    playNextPrioritySound();
+  }
+  syncGameMusic();
+}
+function startWheelSound(key) {
+  if (activeWheelSoundKey === key) return;
+  stopWheelSound();
+  activeWheelSoundKey = key;
+  stopTransientGameSounds();
+  if (priorityAudio && !priorityAudio.paused) {
+    priorityAudio.pause();
+    priorityPausedForWheel = true;
+  }
+  syncGameMusic();
+  wheelSoundStep = 0;
+  const tick = () => {
+    if (activeWheelSoundKey !== key) return;
+    playWheelTick(wheelSoundStep++);
+    wheelSoundTimeout = setTimeout(tick, Math.min(420, 55 + wheelSoundStep * wheelSoundStep * .45));
+  };
+  tick();
+}
+function playRouletteAnnouncement() {
+  if (prioritySoundPlaying || prioritySoundQueue.length || !settings.gameSoundEnabled || settings.gameSoundVolume <= 0) return;
+  try {
+    unlockAudio();
+    if (!actx || actx.state !== 'running') return;
+    const volume = settings.gameSoundVolume / 100;
+    [[523.25,0,.18],[659.25,.13,.18],[783.99,.26,.2],[1046.5,.44,.42]].forEach(([freq, delay, dur]) => {
+      const now = actx.currentTime + delay, o = trackSoundOscillator(actx.createOscillator()), g = actx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(freq, now);
+      g.gain.setValueAtTime(.0001, now);
+      g.gain.exponentialRampToValueAtTime(.12 * volume, now + .018);
+      g.gain.exponentialRampToValueAtTime(.0001, now + dur);
+      o.connect(g); g.connect(actx.destination); o.start(now); o.stop(now + dur + .02);
+    });
+  } catch (e) {}
+}
+function stopGameMusic() {
+  if (gameMusic) { gameMusic.pause(); gameMusic.currentTime = 0; }
+  currentMusicTrack = null;
+}
+function syncGameMusic(game = room?.game) {
+  if (activeWheelSoundKey || prioritySoundPlaying || prioritySoundQueue.length) { if (gameMusic && !gameMusic.paused) gameMusic.pause(); return; }
+  const track = settings.musicEnabled ? GAME_MUSIC[game] : null;
+  if (!track) { stopGameMusic(); return; }
+  if (!gameMusic) { gameMusic = new Audio(); gameMusic.loop = true; gameMusic.preload = 'none'; }
+  if (currentMusicTrack !== track) {
+    gameMusic.pause(); gameMusic.src = track; gameMusic.load(); gameMusic.currentTime = 0; currentMusicTrack = track;
+  }
+  gameMusic.volume = Math.min(100, settings.musicVolume) / 100;
+  if (gameMusic.paused) gameMusic.play().catch(() => {});
 }
 function toggleSettings() {
   const old = document.getElementById('settingsModal'); if (old) { old.remove(); return; }
   const wrap = document.createElement('div'); wrap.id='settingsModal'; wrap.className='modal';
-  wrap.innerHTML = `<div class="box settings-box"><div class="name">⚙️ ตั้งค่าเกม</div><p class="muted" style="margin:10px 0 16px">ปรับเสียงแต่ละแบบได้ตามต้องการ</p>
-    <label class="setting-row"><span>🔊 เสียงเอฟเฟกต์</span><input id="setSound" type="checkbox" ${settings.sound?'checked':''}></label>
-    <label class="setting-row"><span>📳 สั่นเมื่อกด/ถึงคิว</span><input id="setVibration" type="checkbox" ${settings.vibration?'checked':''}></label>
-    <label class="setting-row"><span>🎵 เพลงพื้นหลัง</span><input id="setMusic" type="checkbox" ${settings.music?'checked':''}></label>
-    <label class="setting-row volume-row"><span>🎵 ระดับเพลงพื้นหลัง <b id="musicVolumeValue">${settings.musicVolume}%</b></span><input id="setMusicVolume" type="range" min="0" max="100" value="${settings.musicVolume}"></label>
-    ${[['tap','เสียงกด'],['card','เสียงเปิดไพ่'],['dice','เสียงลูกเต๋า'],['loss','เสียงแพ้'],['timer','เสียงจับเวลา']].map(([key,label])=>`<label class="setting-row volume-row"><span>${label} <b id="volumeValue-${key}">${settings.sfxVolumes[key]}%</b></span><input class="sfx-volume" data-kind="${key}" type="range" min="0" max="100" value="${settings.sfxVolumes[key]}"></label>`).join('')}
-    <p class="muted" style="font-size:12px;margin:12px 0">ถ้าจะเปิดเพลง ให้วางไฟล์ <b>music.mp3</b> ในโฟลเดอร์ public</p>
+  wrap.innerHTML = `<div class="box settings-box"><div class="name">⚙️ ตั้งค่าเสียง</div>
+    <label class="setting-row volume-row"><span>🎵 ระดับเสียงเพลง <b id="musicVolumeValue">${settings.musicVolume}%</b></span><input id="setMusicVolume" type="range" min="0" max="100" value="${settings.musicVolume}"></label>
+    <label class="setting-row"><span>ปิดเสียงเพลง</span><input id="setMusicMuted" type="checkbox" ${settings.musicEnabled?'':'checked'}></label>
+    <label class="setting-row volume-row"><span>🔊 ระดับเสียงเกม <b id="gameSoundVolumeValue">${settings.gameSoundVolume}%</b></span><input id="setGameSoundVolume" type="range" min="0" max="100" value="${settings.gameSoundVolume}"></label>
+    <label class="setting-row"><span>ปิดเสียงเกม</span><input id="setGameSoundMuted" type="checkbox" ${settings.gameSoundEnabled?'':'checked'}></label>
     <button id="saveSettings">บันทึกการตั้งค่า</button><button class="alt" id="closeSettings">ปิด</button></div>`;
   document.body.appendChild(wrap);
   const musicSlider = document.getElementById('setMusicVolume');
-  musicSlider.oninput=()=>{ settings.musicVolume=Number(musicSlider.value); document.getElementById('musicVolumeValue').textContent=musicSlider.value+'%'; if (bgMusic) bgMusic.volume=settings.musicVolume/100; };
-  wrap.querySelectorAll('.sfx-volume').forEach(slider=>slider.oninput=()=>{ settings.sfxVolumes[slider.dataset.kind]=Number(slider.value); document.getElementById(`volumeValue-${slider.dataset.kind}`).textContent=slider.value+'%'; });
+  const gameSoundSlider = document.getElementById('setGameSoundVolume');
+  musicSlider.oninput=()=>{ settings.musicVolume=Math.min(100,Number(musicSlider.value)); document.getElementById('musicVolumeValue').textContent=settings.musicVolume+'%'; if (gameMusic) gameMusic.volume=settings.musicVolume/100; };
+  gameSoundSlider.oninput=()=>{ settings.gameSoundVolume=Number(gameSoundSlider.value); document.getElementById('gameSoundVolumeValue').textContent=gameSoundSlider.value+'%'; if (priorityAudio) priorityAudio.volume=settings.gameSoundEnabled?settings.gameSoundVolume/100:0; };
   // Handle pointer drags ourselves so touch browsers that scroll the modal instead
   // of dragging a styled native range still update the volume reliably.
   wrap.querySelectorAll('input[type="range"]').forEach(slider=>{
@@ -501,7 +652,7 @@ function toggleSettings() {
     slider.addEventListener('pointerup',endDrag);
     slider.addEventListener('pointercancel',endDrag);
   });
-  document.getElementById('saveSettings').onclick=()=>{ settings.sound=document.getElementById('setSound').checked; settings.vibration=document.getElementById('setVibration').checked; settings.music=document.getElementById('setMusic').checked; settings.musicVolume=Number(musicSlider.value); wrap.querySelectorAll('.sfx-volume').forEach(slider=>settings.sfxVolumes[slider.dataset.kind]=Number(slider.value)); saveSettings(); initMusic(); sfx('tap'); vibrate(25); wrap.remove(); };
+  document.getElementById('saveSettings').onclick=()=>{ settings.musicEnabled=!document.getElementById('setMusicMuted').checked; settings.musicVolume=Math.min(100,Number(musicSlider.value)); settings.gameSoundEnabled=!document.getElementById('setGameSoundMuted').checked; settings.gameSoundVolume=Number(gameSoundSlider.value); if (priorityAudio) priorityAudio.volume=settings.gameSoundEnabled?settings.gameSoundVolume/100:0; if (!settings.gameSoundEnabled || settings.gameSoundVolume<=0) prioritySoundQueue=[]; saveSettings(); syncGameMusic(); sfx('tap'); wrap.remove(); };
   document.getElementById('closeSettings').onclick=()=>wrap.remove();
 }
 
@@ -526,6 +677,11 @@ if (!myId) {
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const emit = (e, d) => socket.emit(e, d);
+function selectGame(game) {
+  if (game === 'lobby') stopGameMusic();
+  else { unlockAudio(); syncGameMusic(game); }
+  emit('selectGame', game);
+}
 const isRed = c => c.s === '♥' || c.s === '♦';
 const secs = ms => (ms / 1000).toFixed(2);
 const queueHtml = (online, turn) => online.map(p =>
@@ -546,16 +702,26 @@ function unlockAudio() {
     }
   } catch (e) {}
 }
-document.addEventListener('pointerdown', () => { unlockAudio(); if (settings.music) initMusic(); });
+document.addEventListener('pointerdown', () => { unlockAudio(); syncGameMusic(); });
 document.addEventListener('touchend', unlockAudio);
-document.addEventListener('click', e => { if (e.target.closest('button') && !['rollBtn'].includes(e.target.id)) { /* เสียงเฉพาะเกมเรียกจาก handler */ } });
+document.addEventListener('click', event => {
+  const control = event.target.closest('button,a[href],[role="button"],[role="link"],[onclick],input[type="checkbox"],input[type="radio"],input[type="range"],select,summary');
+  if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+  const clickSound = { played: false };
+  activeClickSound = clickSound;
+  queueMicrotask(() => {
+    if (!clickSound.played) sfx('tap');
+    if (activeClickSound === clickSound) activeClickSound = null;
+  });
+}, true);
 
 function beep(when, dur, freq) {
-  const o = actx.createOscillator(), g = actx.createGain();
+  if (activeWheelSoundKey || prioritySoundPlaying || prioritySoundQueue.length) return null;
+  const o = trackSoundOscillator(actx.createOscillator()), g = actx.createGain();
   o.type = 'square';
   o.frequency.value = freq;
   g.gain.setValueAtTime(0.0001, when);
-  const volume = (settings.sound ? settings.sfxVolumes.timer : 0) / 100;
+  const volume = (settings.gameSoundEnabled ? settings.gameSoundVolume : 0) / 100;
   g.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.25 * volume), when + 0.01);
   g.gain.setValueAtTime(Math.max(0.0001, 0.25 * volume), when + dur - 0.03);
   g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
@@ -644,12 +810,13 @@ function getLoss() {
 
 // ================= หน้าเข้าห้อง =================
 function renderJoin() {
+  stopGameMusic();
   document.body.classList.remove('taboo-game');
   const code = new URLSearchParams(location.search).get('room') || '';
   app.innerHTML = `
     <section class="join-shell">
       <div class="join-logo" aria-hidden="true"><img src="/game-cards.png" alt=""></div>
-      <div class="join-title">วงเหล้า Party</div><button class="alt" style="margin:8px 0 14px" onclick="toggleSettings()">⚙️ ตั้งค่าเสียงและการสั่น</button>
+      <div class="join-title">วงเหล้า Party</div><button class="alt" style="margin:8px 0 14px" onclick="toggleSettings()">⚙️ ตั้งค่าเสียง</button>
       <p class="join-sub">ปาร์ตี้เริ่มตรงนี้ 🎉<br>ตั้งชื่อ ใส่รหัสห้อง แล้วไปลุ้นกับเพื่อนกัน</p>
       <label class="join-label" for="name">👤 ชื่อที่ใช้ในวง</label>
       <input id="name" autocomplete="nickname" placeholder="ใส่ชื่อเล่นของมึง" maxlength="20" value="${esc(localStorage.getItem('name') || '')}">
@@ -699,6 +866,17 @@ window.addEventListener('resize', () => requestAnimationFrame(fitTabooWord));
 
 function render() {
   if (!room) return renderJoin();
+  syncGameMusic();
+  const roulette = room.punishmentRoll;
+  if (roulette?.status === 'spinning') {
+    startWheelSound(roulette.key);
+  } else {
+    stopWheelSound();
+    if (roulette?.status === 'result' && lastWheelResultKey !== roulette.key) {
+      lastWheelResultKey = roulette.key;
+      playRouletteAnnouncement();
+    }
+  }
   document.body.classList.toggle('taboo-game', room.game === 'taboo');
   const s = room.state;
   if (room.game !== 'taboo' || s.status !== 'playing') tabooConfirmOpen = false;
@@ -713,7 +891,7 @@ function render() {
     <div class="top">
       <div>ห้อง <b>${esc(room.code)}</b></div>
       <div class="btns">
-        ${room.game !== 'lobby' ? `<button class="alt" onclick="emit('selectGame','lobby')">← เลือกเกม</button>` : ''}
+        ${room.game !== 'lobby' ? `<button class="alt" onclick="selectGame('lobby')">← เลือกเกม</button>` : ''}
         <button class="alt" onclick="toggleSettings()">⚙️ ตั้งค่า</button><button class="alt" onclick="leaveRoom()">ออก</button>
       </div>
     </div>
@@ -746,7 +924,7 @@ function render() {
 
       <div class="game-grid">
         ${menu.map(g => `
-          <button class="game-tile" style="--tile-glow:${g.glow}" onclick="emit('selectGame','${g.id}')">
+          <button class="game-tile" style="--tile-glow:${g.glow}" onclick="selectGame('${g.id}')">
             <span class="game-arrow" aria-hidden="true">↗</span>
             <span class="game-art-frame ${g.id === 'word' ? 'word-art' : ''} ${g.id === 'timer' ? 'timer-art' : ''}" aria-hidden="true"><img class="game-art" src="${g.image}" alt=""></span>
             <span class="game-title">${g.title}</span>
@@ -773,7 +951,7 @@ function render() {
       h += `<div class="hist">${s.history.slice(1).map(c => `<span class="${isRed(c) ? 'red' : ''}">${c.r}${c.s}</span>`).join('')}</div>`;
     }
     h += s.remaining > 0
-      ? `<button onclick="sfx('card');vibrate(35);emit('cards:flip')">เปิดไพ่</button>`
+      ? `<button onclick="sfx('card');emit('cards:flip')">เปิดไพ่</button>`
       : `<div class="msg">หมดสำรับ จบเกม! 🎉</div>`;
     h += `<button class="alt" onclick="confirm('สับไพ่ใหม่?')&&emit('cards:reset')">🔄 สับไพ่ใหม่</button>`;
   }
@@ -852,8 +1030,10 @@ function render() {
   // ---------- คำต้องห้าม ----------
   if (room.game === 'taboo') {
     h += `<h2 class="game-heading taboo-heading"><img class="game-heading-art" src="/game-taboo.png" alt="">คำต้องห้าม</h2>`;
-    if (!s.isParticipant) {
-      const waitingText = s.status === 'mode' ? 'กำลังเลือกโหมด' : s.status === 'setup' ? `รอทุกคนกำหนดคำ · ${s.submittedCount}/${s.participantCount}` : s.status === 'ended' ? 'เริ่มรอบใหม่เพื่อรับคำ' : 'รอเริ่มรอบใหม่เพื่อรับคำ';
+    if (s.winner) {
+      h += `<div class="taboo-winner-overlay"><div class="taboo-winner-card" role="status" aria-live="polite"><img src="/taboo-winner.png" alt=""><div class="taboo-winner-name">${esc(s.winner.name)}</div><div class="taboo-winner-text">เป็นผู้ชนะ</div><button onclick="emit('taboo:next')">เล่นอีกรอบ</button></div></div>`;
+    } else if (!s.isParticipant) {
+      const waitingText = s.status === 'mode' ? 'กำลังเลือกโหมด' : s.status === 'setup' ? `รอทุกคนกำหนดคำ · ${s.submittedCount}/${s.participantCount}` : s.status === 'playing' ? 'คุณยอมแพ้แล้ว · รอผู้ชนะ' : 'เริ่มรอบใหม่เพื่อรับคำ';
       h += `<div class="taboo-status">${waitingText}</div>`;
       if (s.status === 'ended') h += `<button onclick="emit('taboo:next')">${s.mode === 'custom' ? 'กำหนดคำรอบใหม่' : 'สุ่มคำรอบใหม่'}</button>`;
     } else if (s.status === 'mode') {
@@ -949,13 +1129,26 @@ function render() {
     const anim = shownKey !== loss.key;
     shownKey = loss.key;
     if (lastLossKey !== loss.key) currentPunishImage = PUNISH_IMAGES[Math.floor(Math.random() * PUNISH_IMAGES.length)];
+    const spin = room.punishmentRoll?.key === loss.key ? room.punishmentRoll : null;
+    const personNames = loss.people.map(p => `<div class="name loss-name">${esc(p.name)}</div>${p.sub ? `<div class="ltime">${p.sub}</div>` : ''}`).join('');
+    let punishmentContent = '';
+    let actions = '';
+    if (spin?.status === 'spinning') {
+      punishmentContent = `<div class="roulette-stage"><div class="roulette-pointer">▼</div><div class="roulette-wheel spinning" style="--wheel-end:${spin.rotation}deg"><span class="roulette-label">1 เป๊ก</span><span class="roulette-label">2 เป๊ก</span><span class="roulette-label">คนขวา</span><span class="roulette-label">คนซ้าย</span><span class="roulette-label">รอด</span><span class="roulette-label">เลือกคน</span></div></div><div class="roulette-caption">กำลังเสี่ยงดวง…</div>`;
+    } else if (spin?.status === 'result' && ROULETTE_OUTCOMES[spin.outcome]) {
+      const outcome = ROULETTE_OUTCOMES[spin.outcome];
+      const resultText = outcome.label.split('·')[0].trim();
+      punishmentContent = `<img class="roulette-result-image" src="${outcome.image}" alt="${esc(outcome.label)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="fallback">🥃</div>${resultText ? `<div class="roulette-result-text">${esc(resultText)}</div>` : ''}`;
+      actions = `<button onclick="closeModal()">ยอมรับชะตา</button>`;
+    } else {
+      punishmentContent = `<img src="${currentPunishImage}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="fallback">👉😆👈</div><div class="dek">แดกกก!!</div>`;
+      actions = `<div class="loss-actions"><button class="fate-btn" onclick="closeModal()">ยอมรับชะตา</button><button class="risk-btn" onclick="this.disabled=true;spinPunishment()">เสี่ยงดวง</button></div>`;
+    }
     h += `<div class="modal"><div class="box loss-box ${anim ? 'anim' : ''}">
-      <img src="${currentPunishImage}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-      <div class="fallback">👉😆👈</div>
-      ${loss.people.map(p => `<div class="name loss-name">${esc(p.name)}</div>${p.sub ? `<div class="ltime">${p.sub}</div>` : ''}`).join('')}
-      <div class="dek">แดกกก!!</div>
+      ${spin?.status === 'result' ? '' : personNames}
+      ${punishmentContent}
       ${loss.mine ? `<div class="mytime">${loss.mine}</div>` : ''}
-      <button onclick="closeModal()">ถัดไป ▶</button>
+      ${actions}
     </div></div>`;
   }
 
@@ -975,7 +1168,7 @@ function render() {
 
   if ((room.game === 'survive' || room.game === 'dice') && s.turn === myId && !s.loser) {
     const key = room.game + ':' + (s.roundId || '') + ':' + (s.opened ? s.opened.length : s.rollId);
-    if (lastTurnKey !== key) { lastTurnKey = key; vibrate(150); }
+    if (lastTurnKey !== key) { lastTurnKey = key; sfx('tap'); }
   }
 
   if (room.game === 'survive') s.opened.forEach(o => seen.add(o.i));
@@ -985,18 +1178,27 @@ function render() {
     lastLossKey = loss.key;
     document.body.classList.remove('flash'); void document.body.offsetWidth;
     document.body.classList.add('flash');
-    vibrate([300, 100, 300]); sfx('loss');
+    queuePrioritySound(LOSS_ANNOUNCEMENT_SOUND);
+  }
+  if (room.game === 'taboo' && s.losers?.length) {
+    if (s.winner) {
+      const winnerKey = `taboo-winner:${s.roundId}:${s.winner.id || s.winner.name}`;
+      if (lastTabooWinnerSoundKey !== winnerKey) {
+        lastTabooWinnerSoundKey = winnerKey;
+        queuePrioritySound(TABOO_WIN_SOUND);
+      }
+    }
   }
 }
 
 // ================= ปุ่มต่างๆ =================
 function pickCard(i) {
-  sfx('card'); vibrate(35);
+  sfx('card');
   document.querySelectorAll('.pc.back').forEach(b => b.disabled = true);
   emit('survive:pick', i);
 }
 function rollDice() {
-  sfx('dice'); vibrate([45, 35, 45]);
+  sfx('dice');
   const b = document.getElementById('rollBtn');
   if (b) b.disabled = true;
   emit('dice:roll');
@@ -1006,14 +1208,30 @@ function skipTurn(game) {
   if (confirm('ข้ามคิว ' + name + '?')) emit(game + ':skip');
 }
 function pickWord(i) { myPick = i; emit('word:pick', i); }
+function spinPunishment() {
+  const loss = getLoss();
+  if (!loss) return;
+  sfx('dice');
+  emit('punishment:spin', loss.key);
+}
 function closeModal() {
-  sfx('tap'); vibrate(25);
+  prioritySoundQueue = [];
+  if (priorityAudio) {
+    priorityAudio.pause();
+    priorityAudio.currentTime = 0;
+    priorityAudio = null;
+  }
+  prioritySoundPlaying = false;
+  priorityPausedForWheel = false;
+  resumeMusicAfterPriority = false;
+  stopTransientGameSounds();
   const l = getLoss();
   if (l) closedKey = l.key;
   render();
 }
 function leaveRoom() {
   if (!confirm('ออกจากห้อง?')) return;
+  stopGameMusic();
   emit('leave');
   clearTimers();
   joined = false;
@@ -1052,3 +1270,5 @@ renderJoin();
 </script>
 </body>
 </html>
+
+
