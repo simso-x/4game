@@ -464,14 +464,7 @@ const ROULETTE_OUTCOMES = [
   { label: 'รอด', image: '/roulette-safe.png' },
   { label: 'เลือกคนยก 1 เป๊ก', image: '/roulette-choose.png' },
 ];
-const GAME_MUSIC = {
-  cards: '/music-cards.mp3',
-  survive: '/music-survive.mp3',
-  dice: '/music-dice.mp3',
-  word: '/music-word.mp3',
-  taboo: '/music-taboo.mp3',
-  timer: '/music-timer.mp3',
-};
+const BACKGROUND_MUSIC = ['/music-cards.mp3', '/music-survive.mp3'];
 const SETTINGS_KEY = 'partyAudioSettingsV2';
 let settings = { musicEnabled: true, musicVolume: 15, gameSoundEnabled: true, gameSoundVolume: 100 };
 try {
@@ -483,7 +476,7 @@ try {
 const LOSS_ANNOUNCEMENT_SOUND = '/game-over.mp3';
 const TABOO_WIN_SOUND = '/win.mp3';
 let currentPunishImage = PUNISH_IMAGES[0];
-let gameMusic = null, currentMusicTrack = null;
+let gameMusic = null, currentMusicTrack = null, backgroundMusicIndex = 0, backgroundMusicActive = false, backgroundMusicGame = null;
 let activeWheelSoundKey = null, wheelSoundTimeout = null, wheelSoundStep = 0, lastWheelResultKey = null;
 let prioritySoundQueue = [], priorityAudio = null, prioritySoundPlaying = false, resumeMusicAfterPriority = false, priorityPausedForWheel = false;
 let lastTabooWinnerSoundKey = null;
@@ -604,12 +597,27 @@ function playRouletteAnnouncement() {
 function stopGameMusic() {
   if (gameMusic) { gameMusic.pause(); gameMusic.currentTime = 0; }
   currentMusicTrack = null;
+  backgroundMusicIndex = 0;
+  backgroundMusicActive = false;
+  backgroundMusicGame = null;
 }
 function syncGameMusic(game = room?.game) {
+  backgroundMusicActive = Boolean(settings.musicEnabled);
+  backgroundMusicGame = game || 'lobby';
+  if (!backgroundMusicActive) { stopGameMusic(); return; }
   if (activeWheelSoundKey || prioritySoundPlaying || prioritySoundQueue.length) { if (gameMusic && !gameMusic.paused) gameMusic.pause(); return; }
-  const track = settings.musicEnabled ? GAME_MUSIC[game] : null;
-  if (!track) { stopGameMusic(); return; }
-  if (!gameMusic) { gameMusic = new Audio(); gameMusic.loop = true; gameMusic.preload = 'none'; }
+  if (!gameMusic) {
+    gameMusic = new Audio();
+    gameMusic.loop = false;
+    gameMusic.preload = 'auto';
+    gameMusic.addEventListener('ended', () => {
+      if (!backgroundMusicActive || !settings.musicEnabled) return;
+      backgroundMusicIndex = (backgroundMusicIndex + 1) % BACKGROUND_MUSIC.length;
+      currentMusicTrack = null;
+      syncGameMusic(backgroundMusicGame);
+    });
+  }
+  const track = BACKGROUND_MUSIC[backgroundMusicIndex];
   if (currentMusicTrack !== track) {
     gameMusic.pause(); gameMusic.src = track; gameMusic.load(); gameMusic.currentTime = 0; currentMusicTrack = track;
   }
@@ -678,8 +686,8 @@ if (!myId) {
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const emit = (e, d) => socket.emit(e, d);
 function selectGame(game) {
-  if (game === 'lobby') stopGameMusic();
-  else { unlockAudio(); syncGameMusic(game); }
+  unlockAudio();
+  syncGameMusic(game);
   emit('selectGame', game);
 }
 const isRed = c => c.s === '♥' || c.s === '♦';
@@ -810,7 +818,7 @@ function getLoss() {
 
 // ================= หน้าเข้าห้อง =================
 function renderJoin() {
-  stopGameMusic();
+  syncGameMusic('lobby');
   document.body.classList.remove('taboo-game');
   const code = new URLSearchParams(location.search).get('room') || '';
   app.innerHTML = `
@@ -887,6 +895,7 @@ function render() {
   if (room.game !== 'timer' && tm.roundId !== null) { clearTimers(); tm.roundId = null; tm.phase = 'idle'; }
 
   let h = room.game === 'taboo' ? '<div class="taboo-rotate-screen">' : '';
+  let tabooWinnerOverlay = '';
   h += `
     <div class="top">
       <div>ห้อง <b>${esc(room.code)}</b></div>
@@ -1031,7 +1040,7 @@ function render() {
   if (room.game === 'taboo') {
     h += `<h2 class="game-heading taboo-heading"><img class="game-heading-art" src="/game-taboo.png" alt="">คำต้องห้าม</h2>`;
     if (s.winner) {
-      h += `<div class="taboo-winner-overlay"><div class="taboo-winner-card" role="status" aria-live="polite"><img src="/taboo-winner.png" alt=""><div class="taboo-winner-name">${esc(s.winner.name)}</div><div class="taboo-winner-text">เป็นผู้ชนะ</div><button onclick="emit('taboo:next')">เล่นอีกรอบ</button></div></div>`;
+      tabooWinnerOverlay = `<div class="taboo-winner-overlay"><div class="taboo-winner-card" role="status" aria-live="polite"><img src="/taboo-winner.png" alt=""><div class="taboo-winner-name">${esc(s.winner.name)}</div><div class="taboo-winner-text">เป็นผู้ชนะ</div><button onclick="emit('taboo:next')">เล่นอีกรอบ</button></div></div>`;
     } else if (!s.isParticipant) {
       const waitingText = s.status === 'mode' ? 'กำลังเลือกโหมด' : s.status === 'setup' ? `รอทุกคนกำหนดคำ · ${s.submittedCount}/${s.participantCount}` : s.status === 'playing' ? 'คุณยอมแพ้แล้ว · รอผู้ชนะ' : 'เริ่มรอบใหม่เพื่อรับคำ';
       h += `<div class="taboo-status">${waitingText}</div>`;
@@ -1122,6 +1131,7 @@ function render() {
   }
 
   if (room.game === 'taboo') h += '</div>';
+  h += tabooWinnerOverlay;
 
   // ---------- หน้าลงโทษ ----------
   const loss = getLoss();
@@ -1231,7 +1241,6 @@ function closeModal() {
 }
 function leaveRoom() {
   if (!confirm('ออกจากห้อง?')) return;
-  stopGameMusic();
   emit('leave');
   clearTimers();
   joined = false;
