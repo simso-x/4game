@@ -673,6 +673,22 @@ body:has(.modal.wheel-active):before{animation:none}
 @keyframes kicker-float{to{transform:translateY(-1px) scale(1.015)}}
 @media(max-width:900px){.party-burst i{filter:none!important}.taboo-winner-overlay:before{opacity:.4}.taboo-winner-overlay:after{opacity:.28}}
 
+/* Calm, low-load result screens */
+.loss-box:before,.loss-box:after{animation:none!important;display:none}
+.modal:has(.loss-box){background:radial-gradient(ellipse at 50% 48%,#7c3aed16,transparent 48%),#050711ed}
+.modal:has(.loss-box):before{display:none}
+.loss-box,.loss-box.anim{animation:punishment-grand .5s cubic-bezier(.16,1,.3,1) both;box-shadow:0 24px 72px #000c,0 0 32px #8b5cf633,inset 0 1px #ffffff20}
+.loss-box .dek,.loss-box .roulette-result-text{text-shadow:none}
+.taboo-winner-overlay:before,.taboo-winner-overlay:after{animation:none;opacity:.12}
+.taboo-winner-card{animation:winner-grand .55s cubic-bezier(.16,1,.3,1) both;box-shadow:0 24px 72px #000d,0 0 36px #fbbf2430,inset 0 1px #ffffff35}
+.taboo-winner-card:after{opacity:.14;animation:none}
+.taboo-winner-card img{animation:winner-image .5s .1s cubic-bezier(.16,1,.3,1) both;box-shadow:0 8px 26px #fbbf2428}
+.taboo-winner-name{animation:winner-name-arrive .45s .1s cubic-bezier(.16,1,.3,1) both}
+.taboo-winner-text{text-shadow:0 0 12px #fbbf2455;animation:result-pop .4s .12s cubic-bezier(.16,1,.3,1) both}
+.taboo-winner-card:before,.taboo-winner-card button:before{animation:none!important}
+.taboo-winner-card button{box-shadow:0 8px 22px #e879f933,inset 0 1px #ffffff55}
+@media(max-width:900px){.taboo-winner-overlay:before,.taboo-winner-overlay:after{opacity:.08}}
+
 </style>
 </head>
 <body>
@@ -862,7 +878,8 @@ function launchPartyBurst(kind) {
   };
   const palette = palettes[kind] || palettes.wheel;
   const layer = document.createElement('div'); layer.className = 'party-burst ' + kind; layer.setAttribute('aria-hidden', 'true');
-  const count = kind === 'win' ? 145 : kind === 'wheel' ? 90 : 82;
+  const count = kind === 'win' ? 42 : kind === 'wheel' ? 90 : 0;
+  if (!count) return;
   for (let i = 0; i < count; i++) {
     const piece = document.createElement('i');
     piece.style.setProperty('--size', (4 + Math.random() * 8).toFixed(1) + 'px');
@@ -1494,7 +1511,6 @@ function render() {
     lastLossKey = loss.key;
     document.body.classList.remove('flash'); void document.body.offsetWidth;
     document.body.classList.add('flash');
-    launchPartyBurst('loss');
     if (room.game !== 'taboo') sfx('loss');
   }
   if (room.game === 'taboo' && s.losers?.length) {
